@@ -91,7 +91,7 @@ public class NetworkManager
 		Shell.execute("wpa_supplicant -B -Dnl80211 -iwlan0 -c/data/misc/wifi/wpa_supplicant.conf");
 		// bring up dhcp client and receive ip (takes some time!)
 		Shell.execute("dhcpcd wlan0");
-		
+		// run custom callback command to trigger setup after connection is established and IP is received
 		Shell.executeCustom(this.eventAfterWifiConnected);
 	}
 
@@ -169,6 +169,11 @@ public class NetworkManager
 
 		return ssid;
 	}
+	
+	public synchronized String getCurrentOperator()
+	{
+		return this.getProp("gsm.sim.operator.alpha");
+	}
 
 	public synchronized String getWifiGateway()
 	{
@@ -210,13 +215,17 @@ public class NetworkManager
 	 * ==================== CALLBACKS =====================
 	 */
 	
-	private CmdCallback eventAfterWifiConnected = new CmdCallback("sleep 1")
+	private CmdCallback eventAfterWifiConnected = new CmdCallback("sleep 0.1")
 	{
 		@Override
 		public void commandCompleted(int id, int exitCode)
 		{
 			super.commandCompleted(id, exitCode);
 			Log.e(LTAG, "Heeere we are!");
+			// check if wlan0 is realy up
+			// reset dns server
+			// remove default rmnet route
+			// activate wifi route
 		}
 	};
 	

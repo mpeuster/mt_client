@@ -76,6 +76,10 @@ public class ControlFragment extends Fragment
 			String mobile_ip = nm.getMobileInterfaceIp();
 			String wifi_ip = nm.getWiFiInterfaceIp();
 
+			// update network status output
+			updateNetworkStatus(mobile_state, mobile_ip, wifi_state, wifi_ip,
+					nm.getCurrentSsid());
+
 			// if status is not equal try inputs, try to check again after some
 			// time
 			if (mobile_state != switchDualNetworking.isChecked()
@@ -102,10 +106,6 @@ public class ControlFragment extends Fragment
 				mHandler.postDelayed(updateTask, 1000);
 				return;
 			}
-
-			// update network status output
-			updateNetworkStatus(mobile_state, mobile_ip, wifi_state, wifi_ip,
-					nm.getCurrentSsid());
 
 			// reset try counter
 			updateTries = 0;
@@ -239,6 +239,9 @@ public class ControlFragment extends Fragment
 		// disable switch
 		this.switchDualNetworking.setEnabled(false);
 
+		// ensure switch state
+		this.switchDualNetworking.setChecked(true);
+
 		// trigger status test (after 5s)
 		mHandler.postDelayed(updateTask, 5000);
 
@@ -323,8 +326,9 @@ public class ControlFragment extends Fragment
 	}
 
 	/**
-	 * Updates the network status view elements.
-	 * Texts and status colors of icons.
+	 * Updates the network status view elements. Texts and status colors of
+	 * icons.
+	 * 
 	 * @param mobile_status
 	 * @param mobile_ip
 	 * @param wifi_status
@@ -336,18 +340,34 @@ public class ControlFragment extends Fragment
 	{
 		// set text views
 		this.textMobileStatus.setText("Mobile: " + mobile_ip);
-		this.textWifiStatus.setText("Wi-Fi: " + wifi_ip + " (" + ssid + ")");
+		this.textWifiStatus.setText("Wi-Fi: " + wifi_ip
+				+ ("0.0.0.0/0".equals(wifi_ip) ? "" : " (" + ssid + ")"));
 
 		// tint image views
 		if (mobile_status)
-			this.imageMobileStatus.setColorFilter(Color.GREEN, Mode.MULTIPLY);
+			if (!mobile_ip.equals("0.0.0.0/0"))
+				this.imageMobileStatus.setColorFilter(Color.GREEN,
+						Mode.MULTIPLY); // ok
+			else
+				this.imageMobileStatus.setColorFilter(Color.RED, Mode.MULTIPLY); // device
+																					// up
+																					// but
+																					// no
+																					// ip
 		else
-			this.imageMobileStatus.setColorFilter(Color.GRAY, Mode.MULTIPLY);
+			this.imageMobileStatus.setColorFilter(Color.GRAY, Mode.MULTIPLY); // down
 
 		if (wifi_status)
-			this.imageWifiStatus.setColorFilter(Color.GREEN, Mode.MULTIPLY);
+			if (!wifi_ip.equals("0.0.0.0/0"))
+				this.imageWifiStatus.setColorFilter(Color.GREEN, Mode.MULTIPLY); // ok
+			else
+				this.imageWifiStatus.setColorFilter(Color.RED, Mode.MULTIPLY); // device
+																				// up
+																				// but
+																				// no
+																				// ip
 		else
-			this.imageWifiStatus.setColorFilter(Color.GRAY, Mode.MULTIPLY);
+			this.imageWifiStatus.setColorFilter(Color.GRAY, Mode.MULTIPLY); // down
 	}
 
 }
