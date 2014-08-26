@@ -176,7 +176,7 @@ public class NetworkManager
 		return this.getProp("net." + MOBILE_INTERFACE + ".gw");
 	}
 
-	public synchronized void setDnsServer(String ip)
+	public synchronized void setDnsServer(String ip, String ip2)
 	{
 		//1. for android < 4.4
 		// try to set global properties
@@ -185,9 +185,9 @@ public class NetworkManager
 		this.setProp("net.dns1", ip);
 		this.setProp("dhcp.wlan0.dns1", ip);
 		this.setProp("net.rmnet0.dns1", ip);
-		this.setProp("net.dns2", ip);
-		this.setProp("dhcp.wlan0.dns2", ip);
-		this.setProp("net.rmnet0.dns2", ip);
+		this.setProp("net.dns2", ip2);
+		this.setProp("dhcp.wlan0.dns2", ip2);
+		this.setProp("net.rmnet0.dns2", ip2);
 		
 		//2.
 		// alternative solution is to set iptable entry, not so nice
@@ -197,8 +197,8 @@ public class NetworkManager
 		//3. for android  >= 4.4
 		Shell.execute("ndc resolver flushif wlan0");
 		Shell.execute("ndc resolver flushdefaultif");
-		Shell.execute("ndc resolver setifdns wlan0 " + ip + " " + ip);
-		Shell.execute("ndc resolver setifdns rmnet0 " + ip + " " + ip);
+		Shell.execute("ndc resolver setifdns wlan0 " + ip + " " + ip2);
+		Shell.execute("ndc resolver setifdns rmnet0 " + ip + " " + ip2);
 		Shell.execute("ndc resolver setdefaultif wlan0");
 	}
 

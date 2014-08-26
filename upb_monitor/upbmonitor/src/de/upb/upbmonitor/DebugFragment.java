@@ -1,6 +1,8 @@
 package de.upb.upbmonitor;
 
 import de.upb.upbmonitor.network.NetworkManager;
+import de.upb.upbmonitor.network.Route;
+import de.upb.upbmonitor.network.RouteManager;
 import android.support.v4.app.Fragment;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -64,13 +66,20 @@ public class DebugFragment extends Fragment
                 // Perform action on click
             	Log.e(LTAG, NetworkManager.getInstance().getWifiGateway());
             	Log.e(LTAG, NetworkManager.getInstance().getMobileGateway());
-            	NetworkManager.getInstance().setDnsServer("8.8.8.8");
+            	NetworkManager.getInstance().setDnsServer("8.8.8.8", "8.8.4.4");
             }
         });
 		
 		b3.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Perform action on click
+            	for(Route r : RouteManager.getInstance().getRoutes())
+            	{
+            		Log.e(LTAG, r.toString());
+            		//RouteManager.getInstance().removeRoute(r);
+            	}
+            	
+            	RouteManager.getInstance().addRoute(new Route("default", "192.168.222.254", "wlan0"));
             	
             }
         });
