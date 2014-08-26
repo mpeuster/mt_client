@@ -1,0 +1,128 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="de.upb.upbmonitor.MainActivity$ControlFragment" >
+
+    <LinearLayout
+        android:id="@+id/layout_controls_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:divider="@drawable/horizontaldivider"
+        android:dividerPadding="0dp"
+        android:orientation="vertical"
+        android:scrollbarStyle="outsideOverlay"
+        android:scrollbars="vertical"
+        android:showDividers="middle" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="4dp" >
+
+            <Switch
+                android:id="@+id/switch_monitoringservice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Monitoring Service" />
+
+            <TextView
+                android:id="@+id/textViewMonitoringStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="8dp"
+                android:text="The monitoring service runs in the background and measures UE activity. It automatically sends these information to the testbed backend."
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp" >
+
+            <Switch
+                android:id="@+id/switch_dualnetworking"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Dual Networking" />
+
+            <TextView
+                android:id="@+id/TextView01"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="8dp"
+                android:text="Enable or disable the dual connectivity mode. If enabled 3G and Wi-Fi interfaces are active simultaneously. This action needs root access. Attention: Wi-Fi status is not shown in status bar of the device."
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="8dp" >
+
+                <TextView
+                    android:id="@+id/textViewMobileStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:text="status" />
+
+                 <ImageView
+                    android:id="@+id/imageViewMobileStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:src="@drawable/ic_mobile_state" />
+            </LinearLayout>
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="8dp" >
+
+               
+
+                <TextView
+                    android:id="@+id/textViewWifiStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:text="status" />
+                
+                 <ImageView
+                    android:id="@+id/imageViewWifiStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:src="@drawable/ic_wifi_state" />
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="0dp"
+        android:autoLink="email"
+        android:gravity="center_horizontal"
+        android:text="(c) 2014 by Manuel Peuster (manuel@peuster.de)"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+</RelativeLayout>

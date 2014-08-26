@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <PreferenceCategory 
+        android:title="Backend"
+        android:key="pref_key_category1">
+	    <EditTextPreference android:title="Backend API address" android:key="pref_backend_api_address" android:defaultValue="192.168.222.101" android:summary="Address of the RESTful backend API. IP or domain without 'http.//'."/>
+	    <EditTextPreference android:key="pref_backend_api_port" android:title="Backend API port" android:defaultValue="5000" android:summary="Port of the RESTful backend API."/>
+	    <EditTextPreference android:title="Device ID" android:key="prof_backend_device_id" android:defaultValue="UE-UPB1" android:summary="Name to identify this UE in the backend controller."/>
+	    <EditTextPreference android:title="Location Service ID" android:key="prof_backend_locationservice_id" android:defaultValue="node1" android:summary="Associatin name for third party location service."/>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="WiFi"
+        android:key="pref_key_category2">
+        <EditTextPreference android:key="pref_wifi_default_ssid" android:title="Default SSID" android:defaultValue="test" android:summary="SSID of default WiFi in dual networking mode."/>
+        <EditTextPreference android:key="pref_wifi_default_psk" android:title="Default WPA PSK" android:defaultValue="test" android:summary="PSK of default WiFi in doal networking mode. Set to 'none' to use no encryption."/>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="Monitoring"
+        android:key="pref_key_category3">
+        <EditTextPreference android:key="pref_monitoring_interval" android:title="Monitor Interval (ms)" android:defaultValue="1000" android:summary="Interval for monitoring event in milliseconds."/>
+        <EditTextPreference android:key="pref_sending_interval" android:title="Min. Sender Interval (ms)" android:defaultValue="5000" android:summary="Minimum interval for sending context updates in milliseconds."/>
+    </PreferenceCategory>
+
+</PreferenceScreen>

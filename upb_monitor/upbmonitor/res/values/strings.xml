@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <string name="app_name">UPBMonitor</string>
+    <string name="settings_name">UPBMonitor Settings</string>
+    <string name="title_section1">Control</string>
+    <string name="title_section2">Monitoring</string>
+    <string name="title_section3">Location</string>
+    <string name="title_section4">Debug</string>
+    <string name="title_section5">Section 5</string>
+    <string name="action_settings">Settings</string>
+    
+    
+    <!-- Template for wpa_supplicant configuration -->
+    <!-- ATTENTION: Formating like line breaks needs to be exactly preserved! -->
+    <string name="wpa_template">ctrl_interface=/data/misc/wifi/sockets\n\
+disable_scan_offload=1\n\
+update_config=1\n\
+device_name=yakju\n\
+manufacturer=samsung\n\
+model_name=Galaxy Nexus\n\
+model_number=Galaxy Nexus\n\
+serial_number=0A3C233F01009003\n\
+device_type=10-0050F204-5\n\
+config_methods=physical_display virtual_push_button\n\
+p2p_disabled=1\n\
+\n\
+network={\n\
+\tssid=\"${SSID}\"\n\
+\tpsk=\"${WPA_PSK}\"\n\
+\tkey_mgmt=${KEY_MGMT}\n\
+\tpriority=1\n\
+}\n\
+</string>
+   
+
+</resources>
