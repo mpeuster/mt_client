@@ -2,8 +2,10 @@ package de.upb.upbmonitor.network;
 
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+
 import android.util.Log;
 import de.upb.upbmonitor.commandline.Shell;
+import de.upb.upbmonitor.commandline.CmdCallback;
 
 /**
  * This class is a network manager to enable Mobile and Wi-Fi connections
@@ -89,6 +91,8 @@ public class NetworkManager
 		Shell.execute("wpa_supplicant -B -Dnl80211 -iwlan0 -c/data/misc/wifi/wpa_supplicant.conf");
 		// bring up dhcp client and receive ip (takes some time!)
 		Shell.execute("dhcpcd wlan0");
+		
+		Shell.executeCustom(this.eventAfterWifiConnected);
 	}
 
 	/**
@@ -202,6 +206,21 @@ public class NetworkManager
 		Shell.execute("ndc resolver setdefaultif wlan0");
 	}
 
+	/**
+	 * ==================== CALLBACKS =====================
+	 */
+	
+	private CmdCallback eventAfterWifiConnected = new CmdCallback("sleep 1")
+	{
+		@Override
+		public void commandCompleted(int id, int exitCode)
+		{
+			super.commandCompleted(id, exitCode);
+			Log.e(LTAG, "Heeere we are!");
+		}
+	};
+	
+	
 	/**
 	 * ====================== HELPER ======================
 	 */

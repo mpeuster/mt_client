@@ -18,17 +18,22 @@ import com.stericson.RootTools.execution.CommandCapture;
  */
 public class Shell
 {
-	private static final String LTAG = "BlockingCommand";
+	private static final String LTAG = "Shell";
 	private static ArrayList<String> output;
 	
 	public static void execute(String... command)
 	{
-		execute(true, false, command);
+		execute(true, false, null, command);
 	}
 	
 	public static ArrayList<String> executeBlocking(String... command)
 	{
-		return execute(true, true, command);
+		return execute(true, true, null, command);
+	}
+	
+	public static void executeCustom(CmdCallback cmd)
+	{
+		execute(true, true, cmd, "");
 	}
 	
 	/**
@@ -39,35 +44,31 @@ public class Shell
 	 * @param command
 	 * @return ArrayList<String>
 	 */
-	private static ArrayList<String> execute(boolean asRoot, final boolean asBlocking, String... command)
+	private static ArrayList<String> execute(boolean asRoot, final boolean asBlocking, CmdCallback custom_cmd, String... command)
 	{
 		// create output array
 		output = new ArrayList<String>();
 		
 		// define command
-		Command cmd = new CommandCapture(0, false, command)
+		Command cmd;
+		
+		if(custom_cmd == null)
 		{
-
-			@Override
-			public void commandCompleted(int id, int exitCode)
+			cmd = new CmdCallback(0, false, command)
 			{
-				Log.v(LTAG, "Cmd: '" + this.getCommand().trim() + "' Exitcode: " + exitCode);
-				this.notifyAll();
-			}
-
-			@Override
-			public void commandOutput(int id, String line)
-			{
-				if(asBlocking)
-					output.add(line);
-			}
-
-			@Override
-			public void commandTerminated(int id, String reason)
-			{
-				this.notifyAll();
-			}
-		};
+				@Override
+				public void commandOutput(int id, String line)
+				{
+					if(asBlocking)
+						output.add(line);
+				}
+			};
+		}
+		else
+		{
+			cmd = custom_cmd;
+		}
+		
 		try
 		{
 			// execute command
