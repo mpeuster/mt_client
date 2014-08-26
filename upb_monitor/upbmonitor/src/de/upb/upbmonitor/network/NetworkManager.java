@@ -166,6 +166,42 @@ public class NetworkManager
 		return ssid;
 	}
 
+	public synchronized String getWifiGateway()
+	{
+		return this.getProp("dhcp." + WIFI_INTERFACE + ".gateway");
+	}
+
+	public synchronized String getMobileGateway()
+	{
+		return this.getProp("net." + MOBILE_INTERFACE + ".gw");
+	}
+
+	public synchronized void setDnsServer(String ip)
+	{
+		//1. for android < 4.4
+		// try to set global properties
+		// however this does not seem to work perfectly, the values
+		// are ignored from time to time
+		this.setProp("net.dns1", ip);
+		this.setProp("dhcp.wlan0.dns1", ip);
+		this.setProp("net.rmnet0.dns1", ip);
+		this.setProp("net.dns2", ip);
+		this.setProp("dhcp.wlan0.dns2", ip);
+		this.setProp("net.rmnet0.dns2", ip);
+		
+		//2.
+		// alternative solution is to set iptable entry, not so nice
+		// http://android.stackexchange.com/questions/62081/how-to-change-mobile-connectionss-dns-on-android-kitkat
+		
+		
+		//3. for android  >= 4.4
+		Shell.execute("ndc resolver flushif wlan0");
+		Shell.execute("ndc resolver flushdefaultif");
+		Shell.execute("ndc resolver setifdns wlan0 " + ip + " " + ip);
+		Shell.execute("ndc resolver setifdns rmnet0 " + ip + " " + ip);
+		Shell.execute("ndc resolver setdefaultif wlan0");
+	}
+
 	/**
 	 * ====================== HELPER ======================
 	 */
@@ -281,6 +317,23 @@ public class NetworkManager
 			return false;
 		}
 		return true;
+	}
+
+	private String getProp(String key)
+	{
+		ArrayList<String> out = Shell.executeBlocking("getprop " + key);
+		// if output is not one line, something went wrong
+		if (out.size() < 1)
+			return null;
+		if (out.get(out.size() - 1).length() < 1)
+			return null;
+		return out.get(out.size() - 1); // always use last line
+
+	}
+
+	private void setProp(String key, String value)
+	{
+		Shell.executeBlocking("setprop " + key + " " + value);
 	}
 
 }
