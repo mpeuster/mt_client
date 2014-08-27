@@ -50,5 +50,16 @@ public class RouteManager
 	{
 		Shell.execute("ip route del " + r.toString());
 	}
+	
+	public synchronized boolean routeExists(Route r)
+	{
+		for(Route r2 : this.getRoutes())
+		{
+			if(r2 != null)
+				if (r2.equals(r))
+				return true;
+		}
+		return false;
+	}
 
 }

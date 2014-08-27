@@ -55,7 +55,7 @@ public class ControlFragment extends Fragment
 	{
 		public void run()
 		{
-			Log.i(LTAG, "Update task run: " + updateTries);
+			Log.d(LTAG, "Update task run: " + updateTries);
 			// count number of tries
 			updateTries++;
 			// check for try count
@@ -349,11 +349,7 @@ public class ControlFragment extends Fragment
 				this.imageMobileStatus.setColorFilter(Color.GREEN,
 						Mode.MULTIPLY); // ok
 			else
-				this.imageMobileStatus.setColorFilter(Color.RED, Mode.MULTIPLY); // device
-																					// up
-																					// but
-																					// no
-																					// ip
+				this.imageMobileStatus.setColorFilter(Color.RED, Mode.MULTIPLY); // problem
 		else
 			this.imageMobileStatus.setColorFilter(Color.GRAY, Mode.MULTIPLY); // down
 
@@ -361,11 +357,7 @@ public class ControlFragment extends Fragment
 			if (!wifi_ip.equals("0.0.0.0/0"))
 				this.imageWifiStatus.setColorFilter(Color.GREEN, Mode.MULTIPLY); // ok
 			else
-				this.imageWifiStatus.setColorFilter(Color.RED, Mode.MULTIPLY); // device
-																				// up
-																				// but
-																				// no
-																				// ip
+				this.imageWifiStatus.setColorFilter(Color.RED, Mode.MULTIPLY); // problem
 		else
 			this.imageWifiStatus.setColorFilter(Color.GRAY, Mode.MULTIPLY); // down
 	}

@@ -91,7 +91,8 @@ public class NetworkManager
 		Shell.execute("wpa_supplicant -B -Dnl80211 -iwlan0 -c/data/misc/wifi/wpa_supplicant.conf");
 		// bring up dhcp client and receive ip (takes some time!)
 		Shell.execute("dhcpcd wlan0");
-		// run custom callback command to trigger setup after connection is established and IP is received
+		// run custom callback command to trigger setup after connection is
+		// established and IP is received
 		Shell.executeCustom(this.eventAfterWifiConnected);
 	}
 
@@ -169,7 +170,7 @@ public class NetworkManager
 
 		return ssid;
 	}
-	
+
 	public synchronized String getCurrentOperator()
 	{
 		return this.getProp("gsm.sim.operator.alpha");
@@ -187,7 +188,7 @@ public class NetworkManager
 
 	public synchronized void setDnsServer(String ip, String ip2)
 	{
-		//1. for android < 4.4
+		// 1. for android < 4.4
 		// try to set global properties
 		// however this does not seem to work perfectly, the values
 		// are ignored from time to time
@@ -197,13 +198,12 @@ public class NetworkManager
 		this.setProp("net.dns2", ip2);
 		this.setProp("dhcp.wlan0.dns2", ip2);
 		this.setProp("net.rmnet0.dns2", ip2);
-		
-		//2.
+
+		// 2.
 		// alternative solution is to set iptable entry, not so nice
 		// http://android.stackexchange.com/questions/62081/how-to-change-mobile-connectionss-dns-on-android-kitkat
-		
-		
-		//3. for android  >= 4.4
+
+		// 3. for android >= 4.4
 		Shell.execute("ndc resolver flushif wlan0");
 		Shell.execute("ndc resolver flushdefaultif");
 		Shell.execute("ndc resolver setifdns wlan0 " + ip + " " + ip2);
@@ -214,22 +214,33 @@ public class NetworkManager
 	/**
 	 * ==================== CALLBACKS =====================
 	 */
-	
-	private CmdCallback eventAfterWifiConnected = new CmdCallback("sleep 0.1")
+
+	private CmdCallback eventAfterWifiConnected = new CmdCallback("sleep 1")
 	{
 		@Override
 		public void commandCompleted(int id, int exitCode)
 		{
-			super.commandCompleted(id, exitCode);
-			Log.e(LTAG, "Heeere we are!");
-			// check if wlan0 is realy up
-			// reset dns server
-			// remove default rmnet route
-			// activate wifi route
+			// super.commandCompleted(id, exitCode);
+			try
+			{
+				// check if wlan0 is really up and working
+				if (isWiFiInterfaceEnabled()
+						&& !getWiFiInterfaceIp().equals("0.0.0.0/0"))
+				{
+					// log information
+					Log.i(LTAG, "Wifi interface is UP and runnig with IP: " + getWiFiInterfaceIp());
+					// set dns server
+				}
+				// reset dns server
+				// remove default rmnet route
+				// activate wifi route
+			} catch (Exception e)
+			{
+				Log.e(LTAG, e.getStackTrace().toString());
+			}
 		}
 	};
-	
-	
+
 	/**
 	 * ====================== HELPER ======================
 	 */

@@ -57,5 +57,19 @@ public class Route
 			part3 = " dev " + dev;
 		return this.prefix + part2 + part3;
 	}
+	
+	public boolean equals(Route r)
+	{
+		if(this.prefix != null)
+			if (!this.prefix.equals(r.prefix))
+				return false;
+		if(this.via != null)
+			if (!this.via.equals(r.via))
+				return false;
+		if(this.dev != null)
+			if (!this.dev.equals(r.dev))
+				return false;
+		return true;
+	}
 
 }

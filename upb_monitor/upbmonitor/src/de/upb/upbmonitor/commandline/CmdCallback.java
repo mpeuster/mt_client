@@ -15,7 +15,7 @@ public class CmdCallback extends CommandCapture
 	
 	public CmdCallback(String... command)
 	{
-		super(0, false, command);
+		super(0, true, command);
 	}
 	
 	@Override
