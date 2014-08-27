@@ -98,13 +98,6 @@ public class NetworkManager
 		Shell.executeCustom(this.eventAfterWifiConnected);
 	}
 
-	public synchronized void diconnectWiFi()
-	{
-		// TODO implement!
-		// trigger callback command
-		Shell.executeCustom(this.eventAfterWifiDisconnected);
-	}
-
 	/**
 	 * Disables the dual networking mode by disabling both, Wi-Fi and mobile
 	 * data. After this, Wi-Fi and Mobile data can again be switched on in
@@ -228,7 +221,7 @@ public class NetworkManager
 	 * ==================== CALLBACKS =====================
 	 */
 
-	private CmdCallback eventAfterDualNetworkingEnabled = new CmdCallback("sleep 0")
+	private CmdCallback eventAfterDualNetworkingEnabled = new CmdCallback("sleep 1")
 	{
 		@Override
 		public void commandCompleted(int id, int exitCode)
@@ -264,7 +257,7 @@ public class NetworkManager
 				// set DNS server
 				setDnsServer("8.8.8.8", "8.8.4.4");
 
-				// remove default rmnet route
+				// remove default rmnet route (if present)
 				RouteManager rm = RouteManager.getInstance();
 				Route r = rm.getRoute("default", null, MOBILE_INTERFACE);
 				if (r != null)
@@ -283,23 +276,7 @@ public class NetworkManager
 		}
 	};
 	
-	private CmdCallback eventAfterWifiDisconnected = new CmdCallback("sleep 0")
-	{
-		@Override
-		public void commandCompleted(int id, int exitCode)
-		{
-			// check if wlan0 is really up but no IP anymore
-			if (isWiFiInterfaceEnabled()
-					&& getWiFiInterfaceIp().equals("0.0.0.0/0"))
-			{
-				// log information
-				Log.i(LTAG, "Wifi is disconnected now.");
-				// ...
-			}
-		}
-	};
-	
-	private CmdCallback eventAfterDualNetworkingDisabled = new CmdCallback("sleep 0")
+	private CmdCallback eventAfterDualNetworkingDisabled = new CmdCallback("sleep 1")
 	{
 		@Override
 		public void commandCompleted(int id, int exitCode)

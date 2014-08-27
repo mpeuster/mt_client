@@ -53,11 +53,12 @@ public class DebugFragment extends Fragment
 		b1.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //NetworkManager.getInstance().switchWiFi();
-            	NetworkManager.getInstance().getWiFiInterfaceIp();
-            	NetworkManager.getInstance().getWiFiInterfaceMac();
-            	NetworkManager.getInstance().getMobileInterfaceIp();
-            	NetworkManager.getInstance().getMobileInterfaceMac();
-            	NetworkManager.getInstance().getCurrentSsid();
+            	//NetworkManager.getInstance().getWiFiInterfaceIp();
+            	//NetworkManager.getInstance().getWiFiInterfaceMac();
+            	//NetworkManager.getInstance().getMobileInterfaceIp();
+            	//NetworkManager.getInstance().getMobileInterfaceMac();
+            	//NetworkManager.getInstance().getCurrentSsid();
+            	NetworkManager.getInstance().connectWiFi("webauth", null);
             }
         });
 		
@@ -72,15 +73,7 @@ public class DebugFragment extends Fragment
 		
 		b3.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // Perform action on click
-            	for(Route r : RouteManager.getInstance().getRouteList())
-            	{
-            		Log.e(LTAG, r.toString());
-            		//RouteManager.getInstance().removeRoute(r);
-            	}
-            	
-            	RouteManager.getInstance().addRoute(new Route("default", "192.168.222.254", "wlan0"));
-            	
+                // Perform action on click        	
             }
         });
 		
