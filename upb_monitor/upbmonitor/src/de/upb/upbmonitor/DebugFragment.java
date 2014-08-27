@@ -58,7 +58,8 @@ public class DebugFragment extends Fragment
             	//NetworkManager.getInstance().getMobileInterfaceIp();
             	//NetworkManager.getInstance().getMobileInterfaceMac();
             	//NetworkManager.getInstance().getCurrentSsid();
-            	NetworkManager.getInstance().connectWiFi("webauth", null);
+            	//NetworkManager.getInstance().connectWiFi("webauth", null);
+            	//Log.i(LTAG, NetworkManager.getInstance().getBackendIp());
             }
         });
 		

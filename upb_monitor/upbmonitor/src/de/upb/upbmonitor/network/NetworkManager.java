@@ -3,6 +3,9 @@ package de.upb.upbmonitor.network;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import de.upb.upbmonitor.commandline.Shell;
 import de.upb.upbmonitor.commandline.CmdCallback;
@@ -24,6 +27,12 @@ public class NetworkManager
 	private static final String WIFI_INTERFACE = "wlan0";
 	private static final String MOBILE_INTERFACE = "rmnet0";
 	private static NetworkManager INSTANCE;
+	private Context myContext = null;
+	
+	public void setContext(Context c)
+	{
+		this.myContext = c;
+	}
 
 	public static String WPA_TEMPLATE = null;
 
@@ -221,7 +230,8 @@ public class NetworkManager
 	 * ==================== CALLBACKS =====================
 	 */
 
-	private CmdCallback eventAfterDualNetworkingEnabled = new CmdCallback("sleep 1")
+	private CmdCallback eventAfterDualNetworkingEnabled = new CmdCallback(
+			"sleep 1")
 	{
 		@Override
 		public void commandCompleted(int id, int exitCode)
@@ -267,6 +277,18 @@ public class NetworkManager
 									+ r.toString());
 					rm.removeRoute(r);
 				}
+				// set route to backend on dev rmnet0
+				String backend_ip = getBackendIp();
+				if(backend_ip != null)
+				{
+					Route rb = new Route(backend_ip, null, MOBILE_INTERFACE);
+					rm.addRoute(rb);
+					Log.i(LTAG, "Added route for backend IP over rmnet0: " + rb.toString());
+				}
+				else
+				{
+					Log.e(LTAG, "Can not resolve backen IP address. Route not set.");
+				}
 				// check for active WiFi route
 				if (!rm.routeExists("default", null, WIFI_INTERFACE))
 					Log.e(LTAG, "ATTENTION: WiFi default route not found.");
@@ -275,8 +297,9 @@ public class NetworkManager
 			}
 		}
 	};
-	
-	private CmdCallback eventAfterDualNetworkingDisabled = new CmdCallback("sleep 1")
+
+	private CmdCallback eventAfterDualNetworkingDisabled = new CmdCallback(
+			"sleep 1")
 	{
 		@Override
 		public void commandCompleted(int id, int exitCode)
@@ -423,6 +446,30 @@ public class NetworkManager
 	private void setProp(String key, String value)
 	{
 		Shell.execute("setprop " + key + " " + value);
+	}
+	
+	private String getBackendIp()
+	{
+		if(this.myContext == null)
+			return null;
+		// get preference value and do name lookup
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(this.myContext);
+		String hostname = preferences.getString("pref_backend_api_address", null);
+		return this.getIpByHostname(hostname);
+	}
+
+	private String getIpByHostname(String hostname)
+	{
+		ArrayList<String> out = Shell.executeBlocking("nslookup " + hostname
+				+ " | grep \"Address 1\" | cut -d \" \" -f3");
+		// if output is not one line, something went wrong
+		if (out.size() < 1)
+			return null;
+		if (out.get(out.size() - 1).length() < 1)
+			return null;
+		return out.get(out.size() - 1); // always use last line
+
 	}
 
 }

@@ -58,6 +58,7 @@ public class MainActivity extends ActionBarActivity implements
 
 		// setup network manager
 		NetworkManager.WPA_TEMPLATE = getString(R.string.wpa_template);
+		NetworkManager.getInstance().setContext(this);
 
 		// Set up the action bar.
 		final ActionBar actionBar = getSupportActionBar();
