@@ -15,6 +15,7 @@ public class CmdCallback extends CommandCapture
 	
 	public CmdCallback(String... command)
 	{
+		// we should use a handler for commands with custom callbacks!
 		super(0, true, command);
 	}
 	

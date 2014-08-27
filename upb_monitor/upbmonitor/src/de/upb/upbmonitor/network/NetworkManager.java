@@ -209,6 +209,8 @@ public class NetworkManager
 		Shell.execute("ndc resolver setifdns wlan0 " + ip + " " + ip2);
 		Shell.execute("ndc resolver setifdns rmnet0 " + ip + " " + ip2);
 		Shell.execute("ndc resolver setdefaultif wlan0");
+		
+		Log.d(LTAG, "Changed DNS server to: " + ip + " and " + ip2);
 	}
 
 	/**
@@ -229,11 +231,12 @@ public class NetworkManager
 				{
 					// log information
 					Log.i(LTAG, "Wifi interface is UP and runnig with IP: " + getWiFiInterfaceIp());
-					// set dns server
+					// set DNS server
+					setDnsServer("8.8.8.8", "8.8.4.4");
+					// TODO afterWifiEvent
+					// remove default rmnet route
+					// activate wifi route
 				}
-				// reset dns server
-				// remove default rmnet route
-				// activate wifi route
 			} catch (Exception e)
 			{
 				Log.e(LTAG, e.getStackTrace().toString());
