@@ -209,7 +209,7 @@ public class NetworkManager
 		Shell.execute("ndc resolver setifdns wlan0 " + ip + " " + ip2);
 		Shell.execute("ndc resolver setifdns rmnet0 " + ip + " " + ip2);
 		Shell.execute("ndc resolver setdefaultif wlan0");
-		
+
 		Log.d(LTAG, "Changed DNS server to: " + ip + " and " + ip2);
 	}
 
@@ -217,12 +217,16 @@ public class NetworkManager
 	 * ==================== CALLBACKS =====================
 	 */
 
+	/**
+	 * This shell command must be called as last command of a WiFi connection process.
+	 * It acts as a callback to setup routing etc. what has to be done after a new WiFi
+	 * connection is established.
+	 */
 	private CmdCallback eventAfterWifiConnected = new CmdCallback("sleep 1")
 	{
 		@Override
 		public void commandCompleted(int id, int exitCode)
 		{
-			// super.commandCompleted(id, exitCode);
 			try
 			{
 				// check if wlan0 is really up and working
@@ -230,16 +234,30 @@ public class NetworkManager
 						&& !getWiFiInterfaceIp().equals("0.0.0.0/0"))
 				{
 					// log information
-					Log.i(LTAG, "Wifi interface is UP and runnig with IP: " + getWiFiInterfaceIp());
+					Log.i(LTAG, "Wifi interface is UP and runnig with IP: "
+							+ getWiFiInterfaceIp());
+
 					// set DNS server
 					setDnsServer("8.8.8.8", "8.8.4.4");
-					// TODO afterWifiEvent
+
 					// remove default rmnet route
-					// activate wifi route
+					RouteManager rm = RouteManager.getInstance();
+					Route r = rm.getRoute("default", null, MOBILE_INTERFACE);
+					if (r != null)
+					{
+						Log.i(LTAG,
+								"Removing default route for mobile: "
+										+ r.toString());
+						rm.removeRoute(r);
+					}
+					// check for active WiFi route
+					if (!rm.routeExists("default", null, WIFI_INTERFACE))
+						Log.e(LTAG, "ATTENTION: WiFi default route not found.");
+					// TODO (optional): Maybe create a new default WiFi route if not present
 				}
 			} catch (Exception e)
 			{
-				Log.e(LTAG, e.getStackTrace().toString());
+				Log.i(LTAG, e.getStackTrace().toString());
 			}
 		}
 	};
@@ -375,7 +393,7 @@ public class NetworkManager
 
 	private void setProp(String key, String value)
 	{
-		Shell.executeBlocking("setprop " + key + " " + value);
+		Shell.execute("setprop " + key + " " + value);
 	}
 
 }

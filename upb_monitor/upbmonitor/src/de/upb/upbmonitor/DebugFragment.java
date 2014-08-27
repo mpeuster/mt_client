@@ -73,7 +73,7 @@ public class DebugFragment extends Fragment
 		b3.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Perform action on click
-            	for(Route r : RouteManager.getInstance().getRoutes())
+            	for(Route r : RouteManager.getInstance().getRouteList())
             	{
             		Log.e(LTAG, r.toString());
             		//RouteManager.getInstance().removeRoute(r);

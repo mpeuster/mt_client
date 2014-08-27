@@ -6,6 +6,36 @@ public class Route
 {
 	private static final String LTAG = "Route";
 
+	public String getPrefix()
+	{
+		return prefix;
+	}
+
+	public void setPrefix(String prefix)
+	{
+		this.prefix = prefix;
+	}
+
+	public String getVia()
+	{
+		return via;
+	}
+
+	public void setVia(String via)
+	{
+		this.via = via;
+	}
+
+	public String getDev()
+	{
+		return dev;
+	}
+
+	public void setDev(String dev)
+	{
+		this.dev = dev;
+	}
+
 	private String prefix;
 	private String via;
 	private String dev;
@@ -60,14 +90,14 @@ public class Route
 	
 	public boolean equals(Route r)
 	{
-		if(this.prefix != null)
-			if (!this.prefix.equals(r.prefix))
+		if(this.prefix != null && r.getPrefix() != null)
+			if (!this.prefix.equals(r.getPrefix()))
 				return false;
-		if(this.via != null)
-			if (!this.via.equals(r.via))
+		if(this.via != null && r.getVia() != null)
+			if (!this.via.equals(r.getVia()))
 				return false;
-		if(this.dev != null)
-			if (!this.dev.equals(r.dev))
+		if(this.dev != null && r.getDev() != null)
+			if (!this.dev.equals(r.getDev()))
 				return false;
 		return true;
 	}

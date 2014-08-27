@@ -23,7 +23,7 @@ public class RouteManager
 		return INSTANCE;
 	}
 
-	public synchronized ArrayList<Route> getRoutes()
+	public synchronized ArrayList<Route> getRouteList()
 	{
 		// get ip route show output
 		ArrayList<String> out = Shell.executeBlocking("ip route show");
@@ -40,6 +40,40 @@ public class RouteManager
 		}	
 		return result;
 	}
+	
+	/**
+	 * Get first matching route.
+	 * Use "null" as wildcard.
+	 * @param prefix
+	 * @param via
+	 * @param dev
+	 * @return
+	 */
+	public synchronized Route getRoute(String prefix, String via, String dev)
+	{
+		for(Route r : this.getRouteList())
+		{
+			boolean prefix_ok = true;
+			boolean via_ok  = true;
+			boolean dev_ok = true;
+			
+			if(prefix != null)
+				if(!prefix.equals(r.getPrefix()))
+					prefix_ok=false;
+			
+			if(via != null)
+				if(!via.equals(r.getVia()))
+					via_ok=false;
+			
+			if(dev != null)
+				if(!dev.equals(r.getDev()))
+					dev_ok=false;
+			
+			if(prefix_ok && via_ok && dev_ok)
+				return r;
+		}
+		return null;
+	}
 
 	public synchronized void addRoute(Route r)
 	{
@@ -51,9 +85,15 @@ public class RouteManager
 		Shell.execute("ip route del " + r.toString());
 	}
 	
+	public synchronized boolean routeExists(String prefix, String via, String dev)
+	{
+		Route r = new Route(prefix, via, dev);
+		return routeExists(r);
+	}
+	
 	public synchronized boolean routeExists(Route r)
 	{
-		for(Route r2 : this.getRoutes())
+		for(Route r2 : this.getRouteList())
 		{
 			if(r2 != null)
 				if (r2.equals(r))
