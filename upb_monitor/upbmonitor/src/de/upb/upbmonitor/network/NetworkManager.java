@@ -57,9 +57,11 @@ public class NetworkManager
 		Shell.execute("svc data enable");
 		// bring up wifi interface by hand
 		Shell.execute("netcfg wlan0 up");
+		// trigger callback command
+		Shell.executeCustom(this.eventAfterDualNetworkingEnabled);
 
 		// try to connect to default WiFi
-		connectToWiFi(ssid, wpa_psk);
+		connectWiFi(ssid, wpa_psk);
 	}
 
 	/**
@@ -71,7 +73,7 @@ public class NetworkManager
 	 * @param ssid
 	 * @param wpa_psk
 	 */
-	public synchronized void connectToWiFi(String ssid, String wpa_psk)
+	public synchronized void connectWiFi(String ssid, String wpa_psk)
 	{
 		Log.i(LTAG, "Connecting to WiFi with SSID: " + ssid + " and PSK: "
 				+ wpa_psk);
@@ -96,6 +98,13 @@ public class NetworkManager
 		Shell.executeCustom(this.eventAfterWifiConnected);
 	}
 
+	public synchronized void diconnectWiFi()
+	{
+		// TODO implement!
+		// trigger callback command
+		Shell.executeCustom(this.eventAfterWifiDisconnected);
+	}
+
 	/**
 	 * Disables the dual networking mode by disabling both, Wi-Fi and mobile
 	 * data. After this, Wi-Fi and Mobile data can again be switched on in
@@ -114,6 +123,8 @@ public class NetworkManager
 		Shell.execute("svc wifi disable");
 		// disable data in manager
 		Shell.execute("svc data disable");
+		// trigger callback command
+		Shell.executeCustom(this.eventAfterDualNetworkingDisabled);
 	}
 
 	public synchronized boolean isDualNetworkingEnabled()
@@ -217,47 +228,88 @@ public class NetworkManager
 	 * ==================== CALLBACKS =====================
 	 */
 
+	private CmdCallback eventAfterDualNetworkingEnabled = new CmdCallback("sleep 0")
+	{
+		@Override
+		public void commandCompleted(int id, int exitCode)
+		{
+			// check if wlan0 is really up
+			if (isWiFiInterfaceEnabled() && isMobileInterfaceEnabled())
+			{
+				// log information
+				Log.i(LTAG, "Wifi & Mobile interface are UP.");
+				// ...
+			}
+		}
+	};
+
 	/**
-	 * This shell command must be called as last command of a WiFi connection process.
-	 * It acts as a callback to setup routing etc. what has to be done after a new WiFi
-	 * connection is established.
+	 * This shell command must be called as last command of a WiFi connection
+	 * process. It acts as a callback to setup routing etc. what has to be done
+	 * after a new WiFi connection is established.
 	 */
 	private CmdCallback eventAfterWifiConnected = new CmdCallback("sleep 1")
 	{
 		@Override
 		public void commandCompleted(int id, int exitCode)
 		{
-			try
+			// check if wlan0 is really up and working
+			if (isWiFiInterfaceEnabled()
+					&& !getWiFiInterfaceIp().equals("0.0.0.0/0"))
 			{
-				// check if wlan0 is really up and working
-				if (isWiFiInterfaceEnabled()
-						&& !getWiFiInterfaceIp().equals("0.0.0.0/0"))
+				// log information
+				Log.i(LTAG, "Wifi is connected and runnig with IP: "
+						+ getWiFiInterfaceIp());
+
+				// set DNS server
+				setDnsServer("8.8.8.8", "8.8.4.4");
+
+				// remove default rmnet route
+				RouteManager rm = RouteManager.getInstance();
+				Route r = rm.getRoute("default", null, MOBILE_INTERFACE);
+				if (r != null)
 				{
-					// log information
-					Log.i(LTAG, "Wifi interface is UP and runnig with IP: "
-							+ getWiFiInterfaceIp());
-
-					// set DNS server
-					setDnsServer("8.8.8.8", "8.8.4.4");
-
-					// remove default rmnet route
-					RouteManager rm = RouteManager.getInstance();
-					Route r = rm.getRoute("default", null, MOBILE_INTERFACE);
-					if (r != null)
-					{
-						Log.i(LTAG,
-								"Removing default route for mobile: "
-										+ r.toString());
-						rm.removeRoute(r);
-					}
-					// check for active WiFi route
-					if (!rm.routeExists("default", null, WIFI_INTERFACE))
-						Log.e(LTAG, "ATTENTION: WiFi default route not found.");
-					// TODO (optional): Maybe create a new default WiFi route if not present
+					Log.i(LTAG,
+							"Removing default route for mobile: "
+									+ r.toString());
+					rm.removeRoute(r);
 				}
-			} catch (Exception e)
+				// check for active WiFi route
+				if (!rm.routeExists("default", null, WIFI_INTERFACE))
+					Log.e(LTAG, "ATTENTION: WiFi default route not found.");
+				// TODO (optional): Maybe create a new default WiFi route if not
+				// present
+			}
+		}
+	};
+	
+	private CmdCallback eventAfterWifiDisconnected = new CmdCallback("sleep 0")
+	{
+		@Override
+		public void commandCompleted(int id, int exitCode)
+		{
+			// check if wlan0 is really up but no IP anymore
+			if (isWiFiInterfaceEnabled()
+					&& getWiFiInterfaceIp().equals("0.0.0.0/0"))
 			{
-				Log.i(LTAG, e.getStackTrace().toString());
+				// log information
+				Log.i(LTAG, "Wifi is disconnected now.");
+				// ...
+			}
+		}
+	};
+	
+	private CmdCallback eventAfterDualNetworkingDisabled = new CmdCallback("sleep 0")
+	{
+		@Override
+		public void commandCompleted(int id, int exitCode)
+		{
+			// check if wlan0 is really down
+			if (!isWiFiInterfaceEnabled() && !isMobileInterfaceEnabled())
+			{
+				// log information
+				Log.i(LTAG, "Wifi & Mobile interface are DOWN.");
+				// ...
 			}
 		}
 	};
