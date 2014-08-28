@@ -1,5 +1,6 @@
 package de.upb.upbmonitor.monitoring;
 
+import de.upb.upbmonitor.assignment.AssignmentController;
 import de.upb.upbmonitor.monitoring.model.UeContext;
 import de.upb.upbmonitor.network.NetworkManager;
 import de.upb.upbmonitor.rest.UeEndpoint;
@@ -79,13 +80,16 @@ public class MonitoringService extends Service
 		// run service's tasks
 		if (!threadHandler.hasMessages(0))
 		{
+			// configure assignment controller
+			AssignmentController.getInstance().updateConfiguration(BACKEND_HOST, BACKEND_PORT);
+			
 			// start monitoring task
 			this.monitoringTask = new MonitoringThread(this,
 					this.threadHandler, MONITORING_INTERVAL);
 			threadHandler.postDelayed(monitoringTask, 0);
 			Log.d(LTAG, "Monitoring task started");
 
-			// start monitoring task
+			// start sender task
 			this.sendingTask = new SenderThread(this, this.threadHandler,
 					SENDING_INTERVAL, BACKEND_HOST, BACKEND_PORT);
 			threadHandler.postDelayed(sendingTask, 0);

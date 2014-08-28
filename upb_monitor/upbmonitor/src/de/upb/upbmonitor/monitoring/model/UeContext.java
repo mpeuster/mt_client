@@ -63,10 +63,18 @@ public class UeContext
 		SharedPreferences.Editor e = p.edit();
 		e.putString("pref_current_URI", mURI);
 		e.commit();
-		
-		// no change indicator here, since it is only set once
-		// and the network controller knows this value
-		//this.mURI = mURI;
+	}
+	
+	private JSONObject mBackendContext;
+	
+	public synchronized JSONObject getBackendContext()
+	{
+		return mBackendContext;
+	}
+
+	public synchronized void setBackendContext(JSONObject mBackendContext)
+	{
+		this.mBackendContext = mBackendContext;
 	}
 
 	private String mDeviceID;

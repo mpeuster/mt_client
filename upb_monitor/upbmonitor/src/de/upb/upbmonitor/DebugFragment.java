@@ -1,5 +1,6 @@
 package de.upb.upbmonitor;
 
+import de.upb.upbmonitor.assignment.AssignmentController;
 import de.upb.upbmonitor.network.NetworkManager;
 import de.upb.upbmonitor.network.Route;
 import de.upb.upbmonitor.network.RouteManager;
@@ -60,6 +61,7 @@ public class DebugFragment extends Fragment
             	//NetworkManager.getInstance().getCurrentSsid();
             	//NetworkManager.getInstance().connectWiFi("webauth", null);
             	//Log.i(LTAG, NetworkManager.getInstance().getBackendIp());
+            	AssignmentController.getInstance().updateAssignment();
             }
         });
 		

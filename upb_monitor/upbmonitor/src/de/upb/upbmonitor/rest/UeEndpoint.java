@@ -7,6 +7,7 @@ import org.apache.http.ParseException;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.util.Log;
 import de.upb.upbmonitor.monitoring.model.UeContext;
@@ -98,7 +99,46 @@ public class UeEndpoint
 
 	public void get()
 	{
+		Log.w(LTAG, "GET operation not yet implemented");
+		class UeGetRequest extends RestAsyncRequest
+		{
+			@Override
+			protected void onPostExecute(HttpResponse response)
+			{
+				// error handling
+				if (response == null)
+				{
+					Log.e(LTAG, "Request error.");
+					return;
+				}
+				if (response.getStatusLine().getStatusCode() != 200)
+				{
+					Log.e(LTAG, "Bad Request: "
+							+ response.getStatusLine().getStatusCode());
+					return;
+				}
+				// result code looks fine, process it:
+				try
+				{
+					// parse json data
+					String json_string;
+					json_string = EntityUtils.toString(response.getEntity());
+					JSONObject temp = new JSONObject(json_string);
+					// store received context to model
+					UeContext.getInstance().setBackendContext(temp);
 
+				} catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+				Log.i(LTAG, "UE data was successfully fetched from backend.");
+			}
+		}
+		;
+		UeGetRequest r = new UeGetRequest();
+		r.setup(RequestType.GET, this.mUrl
+				+ UeContext.getInstance().getURI(), null);
+		r.execute();
 	}
 
 	public void remove()
