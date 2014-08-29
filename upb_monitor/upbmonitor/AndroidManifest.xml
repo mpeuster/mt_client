@@ -35,7 +35,7 @@
         </activity>
 
         <service
-            android:name="de.upb.upbmonitor.monitoring.MonitoringService"
+            android:name="de.upb.upbmonitor.service.ManagementService"
             android:icon="@drawable/ic_launcher"
             android:label="UPB MonitoringService" >
         </service>

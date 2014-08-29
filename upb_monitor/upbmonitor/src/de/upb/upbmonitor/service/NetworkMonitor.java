@@ -1,4 +1,4 @@
-package de.upb.upbmonitor.monitoring;
+package de.upb.upbmonitor.service;
 
 import de.upb.upbmonitor.monitoring.model.NetworkTraffic;
 import android.content.Context;

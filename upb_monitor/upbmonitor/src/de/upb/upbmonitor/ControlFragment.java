@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 import com.stericson.RootTools.RootTools;
 
-import de.upb.upbmonitor.monitoring.MonitoringService;
 import de.upb.upbmonitor.monitoring.model.UeContext;
 import de.upb.upbmonitor.network.NetworkManager;
+import de.upb.upbmonitor.service.ManagementService;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -148,7 +148,7 @@ public class ControlFragment extends Fragment
 
 		// set switch state based on service state (if app is restarted)
 		this.switchMonitoringService
-				.setChecked(MonitoringService.SERVICE_EXISTS);
+				.setChecked(ManagementService.SERVICE_EXISTS);
 
 		// set switch state based on network state (if app is restarted)
 		this.switchDualNetworking.setChecked(NetworkManager.getInstance()
@@ -202,7 +202,7 @@ public class ControlFragment extends Fragment
 	 */
 	public void startMonitoringService()
 	{
-		Intent i = new Intent(this.getActivity(), MonitoringService.class);
+		Intent i = new Intent(this.getActivity(), ManagementService.class);
 		this.getActivity().startService(i);
 		// set switch state
 		this.switchMonitoringService.setChecked(true);
@@ -214,7 +214,7 @@ public class ControlFragment extends Fragment
 	 */
 	public void stopMonitoringService()
 	{
-		Intent i = new Intent(this.getActivity(), MonitoringService.class);
+		Intent i = new Intent(this.getActivity(), ManagementService.class);
 		this.getActivity().stopService(i);
 		// set switch state
 		this.switchMonitoringService.setChecked(false);

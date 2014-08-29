@@ -9,8 +9,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import de.upb.upbmonitor.monitoring.MonitoringService;
 import de.upb.upbmonitor.monitoring.model.UeContext;
+import de.upb.upbmonitor.service.ManagementService;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -30,13 +30,13 @@ public class MonitoringFragment extends Fragment
 		{
 			// update headline
 			textMonitoringServiceStatus
-					.setText(MonitoringService.SERVICE_EXISTS ? "Current Device State:"
+					.setText(ManagementService.SERVICE_EXISTS ? "Current Device State:"
 							: "Turn monitoring service on in order to see monitoring outputs.");
 						
 			// update list view
 			if (adapter != null)
 			{
-				if(MonitoringService.SERVICE_EXISTS)
+				if(ManagementService.SERVICE_EXISTS)
 					adapter.updateData(UeContext.getInstance().toListViewData());
 				else // if service is not active, show empty list
 					adapter.updateData(null);

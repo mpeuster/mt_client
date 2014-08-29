@@ -1,4 +1,4 @@
-package de.upb.upbmonitor.monitoring;
+package de.upb.upbmonitor.service;
 
 import de.upb.upbmonitor.assignment.AssignmentController;
 import de.upb.upbmonitor.monitoring.model.UeContext;
@@ -14,9 +14,9 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
-public class MonitoringService extends Service
+public class ManagementService extends Service
 {
-	private static final String LTAG = "MonitoringService";
+	private static final String LTAG = "ManagementService";
 	public static boolean SERVICE_EXISTS = false;
 	private static int MONITORING_INTERVAL = Integer.MAX_VALUE;
 	private static int SENDING_INTERVAL = Integer.MAX_VALUE;

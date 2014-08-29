@@ -1,4 +1,4 @@
-package de.upb.upbmonitor.monitoring;
+package de.upb.upbmonitor.service;
 
 import android.content.Context;
 import android.os.Handler;
