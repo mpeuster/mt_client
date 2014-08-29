@@ -1,8 +1,11 @@
 package de.upb.upbmonitor.service;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import de.upb.upbmonitor.model.UeContext;
 import android.os.Handler;
 import android.util.Log;
-
 
 /**
  * Represents the assignment thread of the service.
@@ -16,14 +19,12 @@ public class AssignmentThread implements Runnable
 	private Handler myHandler;
 	private int mInterval;
 
-
-	public AssignmentThread(Handler myHandler,
-			int interval)
-	{ 
+	public AssignmentThread(Handler myHandler, int interval)
+	{
 		// arguments
 		this.myHandler = myHandler;
 		this.mInterval = interval;
-		
+
 		// kick off periodic run
 		this.getHandler().postDelayed(this, 0);
 	}
@@ -31,9 +32,19 @@ public class AssignmentThread implements Runnable
 	public void run()
 	{
 		Log.v(LTAG, "Awake with interval: " + this.mInterval);
-		
-		// TODO implement assignment logic
-	
+
+		// get latest backend assignment and current assignment
+		String assignedApBackend = this.getAssignedApUriFromBackend();
+		String assignedApCurrent = UeContext.getInstance().getAssignedApURI();
+
+		if (isConnectionChangeNeeded(assignedApBackend, assignedApCurrent))
+		{
+			Log.i(LTAG, "Connection change needed!" + "Backend: "
+					+ assignedApBackend + " / Current: " + assignedApCurrent);
+			UeContext.getInstance().setAssignedApURI(assignedApBackend);
+			// TODO implement assignment logic
+		}
+
 		// re-schedule
 		myHandler.postDelayed(this, this.mInterval);
 	}
@@ -41,5 +52,37 @@ public class AssignmentThread implements Runnable
 	public synchronized Handler getHandler()
 	{
 		return this.myHandler;
+	}
+
+	private String getAssignedApUriFromBackend()
+	{
+		// get latest backend data from model (produced by receiver thread)
+		JSONObject backend_data = UeContext.getInstance().getBackendContext();
+		// no backend data available yet
+		if (backend_data == null)
+			return null;
+		try
+		{
+			// no ap assigned
+			if (backend_data.get("assigned_accesspoint") == null)
+				return null;
+			// ap assigned, return URI as string
+			return backend_data.get("assigned_accesspoint").toString();
+		} catch (Exception e)
+		{
+			Log.e(LTAG, "Could not fetch assignment from backend data.");
+		}
+		return null;
+	}
+
+	private boolean isConnectionChangeNeeded(String ap_backend,
+			String ap_current)
+	{
+		// null case
+		if (ap_backend == null || ap_current == null)
+			return (ap_backend != ap_current);
+
+		// string case
+		return !ap_backend.equals(ap_current);
 	}
 }

@@ -202,6 +202,11 @@ public class ControlFragment extends Fragment
 	 */
 	public void startMonitoringService()
 	{
+		// reset model
+		UeContext.getInstance().setApplicationContext(this.getActivity());
+		UeContext.getInstance().setAssignedApURI(null);
+		Log.e(LTAG, "SET");
+		// start service
 		Intent i = new Intent(this.getActivity(), ManagementService.class);
 		this.getActivity().startService(i);
 		// set switch state
