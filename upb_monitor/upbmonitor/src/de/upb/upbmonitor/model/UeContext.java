@@ -59,15 +59,29 @@ public class UeContext
 			return null;
 		SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this.myContext);
 		return p.getString("pref_current_URI", null);
-		//return mURI;
 	}
 
 	public synchronized void setURI(String mURI)
 	{
-		// get preference manager
 		SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this.myContext);
 		SharedPreferences.Editor e = p.edit();
 		e.putString("pref_current_URI", mURI);
+		e.commit();
+	}
+	
+	public synchronized String getAssignedApURI()
+	{
+		if(this.myContext == null)
+			return null;
+		SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this.myContext);
+		return p.getString("pref_assigned_ap_URI", null);
+	}
+	
+	public synchronized void setAssignedApURI(String mURI)
+	{
+		SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this.myContext);
+		SharedPreferences.Editor e = p.edit();
+		e.putString("pref_assigned_ap_URI", mURI);
 		e.commit();
 	}
 	
