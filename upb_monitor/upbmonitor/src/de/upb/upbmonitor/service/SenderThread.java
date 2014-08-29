@@ -18,7 +18,7 @@ public class SenderThread implements Runnable
 	private static final String LTAG = "SenderThread";
 	private Context myContext;
 	private Handler myHandler;
-	private int mSenderInterval;
+	private int mInterval;
 	private UeEndpoint restUeEndpoint = null;
 	private boolean shuldBeConnected = false;
 
@@ -28,7 +28,7 @@ public class SenderThread implements Runnable
 		// arguments
 		this.myContext = myContext;
 		this.myHandler = myHandler;
-		this.mSenderInterval = interval;
+		this.mInterval = interval;
 		
 		// also pass context to model
 		UeContext.getInstance().updateApplicationContext(myContext);
@@ -40,7 +40,7 @@ public class SenderThread implements Runnable
 
 	public void run()
 	{
-		Log.v(LTAG, "Awake with interval: " + this.mSenderInterval);
+		Log.v(LTAG, "Awake with interval: " + this.mInterval);
 		// access model
 		UeContext c = UeContext.getInstance();
 		
@@ -69,7 +69,7 @@ public class SenderThread implements Runnable
 		}
 		
 		// re-schedule
-		myHandler.postDelayed(this, this.mSenderInterval);
+		myHandler.postDelayed(this, this.mInterval);
 	}
 
 	private void sendUpdate()

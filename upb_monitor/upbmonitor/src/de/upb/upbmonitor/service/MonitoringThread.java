@@ -19,7 +19,7 @@ public class MonitoringThread implements Runnable
 	private static final String LTAG = "MonitoringThread";
 	private Context myContext;
 	private Handler myHandler;
-	private int mMonitoringInterval;
+	private int mInterval;
 	
 	private SystemMonitor mSystemMonitor;
 	private NetworkMonitor mNetworkMonitor;
@@ -29,7 +29,7 @@ public class MonitoringThread implements Runnable
 	{	// arguments
 		this.myContext = myContext;
 		this.myHandler = myHandler;
-		this.mMonitoringInterval = monitoringInterval;
+		this.mInterval = monitoringInterval;
 		
 		// initializations
 		this.mSystemMonitor = new SystemMonitor(this.myContext);	
@@ -39,10 +39,10 @@ public class MonitoringThread implements Runnable
 	public void run()
 	{
 		Log.v(LTAG, "Awake with interval: "
-				+ this.mMonitoringInterval);
+				+ this.mInterval);
 		// periodically monitor
 		this.monitor();
-		myHandler.postDelayed(this, this.mMonitoringInterval);
+		myHandler.postDelayed(this, this.mInterval);
 	}
 
 	private void monitor()

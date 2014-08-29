@@ -31,6 +31,9 @@ public class ManagementService extends Service
 	
 	private HandlerThread receiverThread;
 	private ReceiverThread receiverTask = null;
+	
+	private HandlerThread assignmentThread;
+	private AssignmentThread assignmentTask = null;
 
 	@Override
 	public void onCreate()
@@ -54,6 +57,9 @@ public class ManagementService extends Service
 		
 		receiverTask.getHandler().removeCallbacks(receiverTask);
 		receiverThread.quit();
+		
+		assignmentTask.getHandler().removeCallbacks(receiverTask);
+		assignmentThread.quit();
 
 		senderTask.removeUe(); // attention not async!
 		SERVICE_EXISTS = false;
@@ -107,6 +113,7 @@ public class ManagementService extends Service
 		this.monitorTask.getHandler().postDelayed(monitorTask, 0);
 
 		// start sender task (independent looper thread)
+		// OPTIONAL: Change sending to be event based and not interval based
 		this.senderThread = new HandlerThread("SenderThread");
 		this.senderThread.start();
 		this.senderTask = new SenderThread(this, new Handler(
@@ -124,6 +131,14 @@ public class ManagementService extends Service
 				BACKEND_HOST, BACKEND_PORT);
 		// kick off receiving
 		this.receiverTask.getHandler().postDelayed(receiverTask, 0);
+		
+		// start assignment task (independent looper thread)
+		this.assignmentThread = new HandlerThread("AssignmentThread");
+		this.assignmentThread.start();
+		this.assignmentTask = new AssignmentThread(new Handler(
+				this.assignmentThread.getLooper()), 1000);
+		// kick off receiving
+		this.assignmentTask.getHandler().postDelayed(assignmentTask, 0);
 		
 		Log.i(LTAG, "Management service and its worker thrads successfully started.");
 		
