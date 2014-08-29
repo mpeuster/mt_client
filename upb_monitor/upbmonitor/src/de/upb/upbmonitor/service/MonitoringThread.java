@@ -34,6 +34,9 @@ public class MonitoringThread implements Runnable
 		// initializations
 		this.mSystemMonitor = new SystemMonitor(this.myContext);	
 		this.mNetworkMonitor = new NetworkMonitor(this.myContext);
+		
+		// kick off periodic run
+		this.getHandler().postDelayed(this, 0);
 	}
 
 	public void run()

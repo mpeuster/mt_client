@@ -24,6 +24,8 @@ public class AssignmentThread implements Runnable
 		this.myHandler = myHandler;
 		this.mInterval = interval;
 		
+		// kick off periodic run
+		this.getHandler().postDelayed(this, 0);
 	}
 
 	public void run()

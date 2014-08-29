@@ -104,9 +104,7 @@ public class ManagementService extends Service
 		this.monitorThread.start();
 		this.monitorTask = new MonitoringThread(this, new Handler(
 				this.monitorThread.getLooper()), MONITORING_INTERVAL);
-		// kick off monitoring
-		this.monitorTask.getHandler().postDelayed(monitorTask, 0);
-
+		
 		// start sender task (independent looper thread)
 		// OPTIONAL: Change sending to be event based and not interval based
 		this.senderThread = new HandlerThread("SenderThread");
@@ -114,8 +112,6 @@ public class ManagementService extends Service
 		this.senderTask = new SenderThread(this, new Handler(
 				this.senderThread.getLooper()), SENDING_INTERVAL,
 				BACKEND_HOST, BACKEND_PORT);
-		// kick off sending
-		this.senderTask.getHandler().postDelayed(senderTask, 0);
 				
 		// start receiver task (independent looper thread)
 		// TODO: use push notification to trigger receiver task, instead of active polling
@@ -124,16 +120,13 @@ public class ManagementService extends Service
 		this.receiverTask = new ReceiverThread(new Handler(
 				this.receiverThread.getLooper()), 2000,
 				BACKEND_HOST, BACKEND_PORT);
-		// kick off receiving
-		this.receiverTask.getHandler().postDelayed(receiverTask, 0);
-		
+				
 		// start assignment task (independent looper thread)
 		this.assignmentThread = new HandlerThread("AssignmentThread");
 		this.assignmentThread.start();
 		this.assignmentTask = new AssignmentThread(new Handler(
 				this.assignmentThread.getLooper()), 1000);
-		// kick off receiving
-		this.assignmentTask.getHandler().postDelayed(assignmentTask, 0);
+		
 		
 		Log.i(LTAG, "Management service and its worker thrads successfully started.");
 		
