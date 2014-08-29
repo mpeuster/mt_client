@@ -20,17 +20,23 @@ public class UeContext
 	 */
 
 	private static final String LTAG = "UeContext";
-	private Context myContext = null;
 	private static UeContext INSTANCE;
 	private boolean CONTEXT_CHANGED;
 
 	/**
-	 * Context is needed to access shared preferences. It is set by the monitoring and/or sender thread.
+	 * Context Application context pointer.
 	 * @param c
 	 */
-	public synchronized void updateApplicationContext(Context c)
+	private Context myContext = null;
+	
+	public synchronized void setApplicationContext(Context c)
 	{
 		this.myContext = c;
+	}
+	
+	public synchronized Context getApplicationContext()
+	{
+		return this.myContext;
 	}
 
 	private int mUpdateCount;

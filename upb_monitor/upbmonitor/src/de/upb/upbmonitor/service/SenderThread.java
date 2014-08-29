@@ -16,23 +16,18 @@ import de.upb.upbmonitor.rest.UeEndpoint;
 public class SenderThread implements Runnable
 {
 	private static final String LTAG = "SenderThread";
-	private Context myContext;
 	private Handler myHandler;
 	private int mInterval;
 	private UeEndpoint restUeEndpoint = null;
 	private boolean shuldBeConnected = false;
 
-	public SenderThread(Context myContext, Handler myHandler,
+	public SenderThread(Handler myHandler,
 			int interval, String backendHost, int backendPort)
 	{ 
 		// arguments
-		this.myContext = myContext;
 		this.myHandler = myHandler;
 		this.mInterval = interval;
-		
-		// also pass context to model
-		UeContext.getInstance().updateApplicationContext(myContext);
-		
+	
 		// initializations
 		// API end point
 		this.restUeEndpoint = new UeEndpoint(backendHost, backendPort);
@@ -58,7 +53,7 @@ public class SenderThread implements Runnable
 			else
 			{
 				// something went wrong with the register operation in the last try
-				Toast.makeText(myContext,
+				Toast.makeText(UeContext.getInstance().getApplicationContext(),
 						"Backend connection error.",
 						Toast.LENGTH_SHORT).show();
 				// trigger re-register

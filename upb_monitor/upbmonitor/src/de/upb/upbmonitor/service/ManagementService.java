@@ -102,14 +102,14 @@ public class ManagementService extends Service
 		// start monitoring task (independent looper thread)
 		this.monitorThread = new HandlerThread("MonitorThread");
 		this.monitorThread.start();
-		this.monitorTask = new MonitoringThread(this, new Handler(
+		this.monitorTask = new MonitoringThread(new Handler(
 				this.monitorThread.getLooper()), MONITORING_INTERVAL);
 		
 		// start sender task (independent looper thread)
 		// OPTIONAL: Change sending to be event based and not interval based
 		this.senderThread = new HandlerThread("SenderThread");
 		this.senderThread.start();
-		this.senderTask = new SenderThread(this, new Handler(
+		this.senderTask = new SenderThread(new Handler(
 				this.senderThread.getLooper()), SENDING_INTERVAL,
 				BACKEND_HOST, BACKEND_PORT);
 				
@@ -137,6 +137,8 @@ public class ManagementService extends Service
 	private void initializeContext()
 	{
 		UeContext c = UeContext.getInstance();
+		// pass application context to model
+		UeContext.getInstance().setApplicationContext(this);
 		// values from preferences
 		SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(this);

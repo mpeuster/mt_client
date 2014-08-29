@@ -17,32 +17,30 @@ import de.upb.upbmonitor.model.UeContext;
 public class MonitoringThread implements Runnable
 {
 	private static final String LTAG = "MonitoringThread";
-	private Context myContext;
 	private Handler myHandler;
 	private int mInterval;
-	
+
 	private SystemMonitor mSystemMonitor;
 	private NetworkMonitor mNetworkMonitor;
 
-	public MonitoringThread(Context myContext, Handler myHandler,
-			int monitoringInterval)
-	{	// arguments
-		this.myContext = myContext;
+	public MonitoringThread(Handler myHandler, int monitoringInterval)
+	{ // arguments
 		this.myHandler = myHandler;
 		this.mInterval = monitoringInterval;
-		
+
 		// initializations
-		this.mSystemMonitor = new SystemMonitor(this.myContext);	
-		this.mNetworkMonitor = new NetworkMonitor(this.myContext);
-		
+		this.mSystemMonitor = new SystemMonitor(UeContext.getInstance()
+				.getApplicationContext());
+		this.mNetworkMonitor = new NetworkMonitor(UeContext.getInstance()
+				.getApplicationContext());
+
 		// kick off periodic run
 		this.getHandler().postDelayed(this, 0);
 	}
 
 	public void run()
 	{
-		Log.v(LTAG, "Awake with interval: "
-				+ this.mInterval);
+		Log.v(LTAG, "Awake with interval: " + this.mInterval);
 		// periodically monitor
 		this.monitor();
 		myHandler.postDelayed(this, this.mInterval);
@@ -57,7 +55,7 @@ public class MonitoringThread implements Runnable
 		UeContext c = UeContext.getInstance();
 		c.incrementUpdateCount();
 	}
-	
+
 	public synchronized Handler getHandler()
 	{
 		return this.myHandler;
