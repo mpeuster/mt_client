@@ -1,6 +1,5 @@
 package de.upb.upbmonitor.service;
 
-import de.upb.upbmonitor.assignment.AssignmentController;
 import de.upb.upbmonitor.monitoring.model.UeContext;
 import de.upb.upbmonitor.network.NetworkManager;
 import de.upb.upbmonitor.rest.UeEndpoint;
@@ -99,10 +98,6 @@ public class ManagementService extends Service
 
 		// initialize context model
 		this.initializeContext();
-
-		// configure assignment controller
-		AssignmentController.getInstance().updateConfiguration(BACKEND_HOST,
-				BACKEND_PORT);
 
 		// start monitoring task (independent looper thread)
 		this.monitorThread = new HandlerThread("MonitorThread");
