@@ -43,6 +43,8 @@ public class AssignmentThread implements Runnable
 					+ assignedApBackend + " / Current: " + assignedApCurrent);
 			UeContext.getInstance().setAssignedApURI(assignedApBackend);
 			// TODO implement assignment logic
+			// 1. fetch AP information
+			// 2. toggle WiFi re-connect
 		}
 
 		// re-schedule

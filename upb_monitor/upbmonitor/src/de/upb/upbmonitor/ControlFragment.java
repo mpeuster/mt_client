@@ -43,72 +43,58 @@ public class ControlFragment extends Fragment
 
 	private Handler mHandler = new Handler();
 	private int updateTries = 0;
-	private static final int MAX_RETRY = 10;
+	private static final int MAX_RETRY_BEFORE_SWITCH_RESET = 10;
 
 	/**
-	 * Background task that checks the network status. If the current status
-	 * fits to user inputs, its stops checking. Needed, because it is not always
-	 * clear how long it takes until, dual networking mode is up and IPs are
-	 * received.
+	 * Background task that checks the network status. Needed, because it is not
+	 * always clear how long it takes until, dual networking mode is up and IPs
+	 * are received.
 	 */
-	private Runnable updateTask = new Runnable()
+	private Runnable periodicGuiUpdateTask = new Runnable()
 	{
 		public void run()
 		{
-			Log.v(LTAG, "Control fragment update task run: " + updateTries);
 			// count number of tries
 			updateTries++;
 			// check for try count
-			if (updateTries > MAX_RETRY)
+			if (updateTries == MAX_RETRY_BEFORE_SWITCH_RESET)
 			{
-				Log.w(LTAG, "Update task has reached MAX_RETRY.");
+				// after a certain number of updates, we re-enable the switch.
+				// this is a fallback ensuring that the user can switch of the
+				// dual network mode again
+				Log.w(LTAG,
+						"Update task has reached MAX_RETRY_BEFORE_SWITCH_RESET.");
 				// enable switch (fallback)
 				switchDualNetworking.setEnabled(true);
-				// reset and stop runnable
-				updateTries = 0;
-				return;
+			}
+			
+			
+			if(isVisible())
+			{
+				// get network status
+				NetworkManager nm = NetworkManager.getInstance();
+				boolean mobile_state = nm.isMobileInterfaceEnabled();
+				boolean wifi_state = nm.isWiFiInterfaceEnabled();
+				String mobile_ip = nm.getMobileInterfaceIp();
+				String wifi_ip = nm.getWiFiInterfaceIp();
+	
+				// update network status output
+				updateNetworkStatus(mobile_state, mobile_ip, wifi_state, wifi_ip,
+						nm.getCurrentSsid());
+	
+				// if status is not equal try inputs, try to check again after some
+				// time
+				if (mobile_state == switchDualNetworking.isChecked()
+						&& wifi_state == switchDualNetworking.isChecked())
+				{
+					// if network state matches inputs, re-enable switch
+					switchDualNetworking.setEnabled(true);
+					updateTries = MAX_RETRY_BEFORE_SWITCH_RESET + 1;
+				}
 			}
 
-			// get network status
-			NetworkManager nm = NetworkManager.getInstance();
-			boolean mobile_state = nm.isMobileInterfaceEnabled();
-			boolean wifi_state = nm.isWiFiInterfaceEnabled();
-			String mobile_ip = nm.getMobileInterfaceIp();
-			String wifi_ip = nm.getWiFiInterfaceIp();
-
-			// update network status output
-			updateNetworkStatus(mobile_state, mobile_ip, wifi_state, wifi_ip,
-					nm.getCurrentSsid());
-
-			// if status is not equal try inputs, try to check again after some
-			// time
-			if (mobile_state != switchDualNetworking.isChecked()
-					|| wifi_state != switchDualNetworking.isChecked())
-			{
-				mHandler.postDelayed(updateTask, 2000);
-				return;
-			} else
-			{
-				// is network state matches inputs, re-enable switch
-				switchDualNetworking.setEnabled(true);
-			}
-
-			// if IP state does not match network state, try to check it again
-			if (mobile_state == "0.0.0.0/0".equals(mobile_ip))
-			{
-				mHandler.postDelayed(updateTask, 1000);
-				return;
-			}
-
-			// if IP state does not match network state, try to check it again
-			if (wifi_state == "0.0.0.0/0".equals(wifi_ip))
-			{
-				mHandler.postDelayed(updateTask, 1000);
-				return;
-			}
-
-			// reset try counter
-			updateTries = 0;
+			// toggle next update
+			mHandler.postDelayed(periodicGuiUpdateTask, 2000);
 		}
 	};
 
@@ -191,8 +177,9 @@ public class ControlFragment extends Fragment
 		this.switchDualNetworking.setEnabled(this.checkRootAvailability()
 				&& this.checkBusyBoxAvailability());
 
-		// update network status
-		mHandler.postDelayed(updateTask, 0);
+		// kick off periodic update task
+		mHandler.removeCallbacks(periodicGuiUpdateTask); // remove old one if existing
+		mHandler.postDelayed(periodicGuiUpdateTask, 0);
 
 		return rootView;
 	}
@@ -241,8 +228,8 @@ public class ControlFragment extends Fragment
 		// ensure switch state
 		this.switchDualNetworking.setChecked(true);
 
-		// trigger status test (after 5s)
-		mHandler.postDelayed(updateTask, 5000);
+		// reset update try counter
+		updateTries = 0;
 
 		// get preferences for default WiFi
 		SharedPreferences preferences = PreferenceManager
@@ -277,8 +264,8 @@ public class ControlFragment extends Fragment
 		// disable switch
 		this.switchDualNetworking.setEnabled(false);
 
-		// trigger status test (after 3s)
-		mHandler.postDelayed(updateTask, 3000);
+		// reset update try counter
+		updateTries = 0;
 
 		// try to disable dual networking
 		nm.disableDualNetworking();
@@ -313,7 +300,7 @@ public class ControlFragment extends Fragment
 	{
 		if (RootTools.isBusyboxAvailable())
 		{
-			Log.i(LTAG, "Busybox is available.");
+			Log.d(LTAG, "Busybox is available.");
 			return true;
 		}
 
