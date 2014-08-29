@@ -10,7 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.util.Log;
-import de.upb.upbmonitor.monitoring.model.UeContext;
+import de.upb.upbmonitor.model.UeContext;
 import de.upb.upbmonitor.rest.RestAsyncRequest.RequestType;
 
 public class UeEndpoint

@@ -9,7 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import de.upb.upbmonitor.monitoring.model.UeContext;
+import de.upb.upbmonitor.model.UeContext;
 import de.upb.upbmonitor.service.ManagementService;
 import android.widget.ListView;
 import android.widget.TextView;

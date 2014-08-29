@@ -5,7 +5,7 @@ import android.os.Handler;
 import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
-import de.upb.upbmonitor.monitoring.model.UeContext;
+import de.upb.upbmonitor.model.UeContext;
 import de.upb.upbmonitor.rest.UeEndpoint;
 
 /**

@@ -3,7 +3,7 @@ package de.upb.upbmonitor.service;
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
-import de.upb.upbmonitor.monitoring.model.UeContext;
+import de.upb.upbmonitor.model.UeContext;
 
 /**
  * Represents the monitoring thread of the service.

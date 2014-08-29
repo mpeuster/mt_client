@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.stericson.RootTools.RootTools;
 
-import de.upb.upbmonitor.monitoring.model.UeContext;
+import de.upb.upbmonitor.model.UeContext;
 import de.upb.upbmonitor.network.NetworkManager;
 import de.upb.upbmonitor.service.ManagementService;
 import android.support.v4.app.Fragment;

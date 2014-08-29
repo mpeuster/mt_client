@@ -1,6 +1,6 @@
 package de.upb.upbmonitor.service;
 
-import de.upb.upbmonitor.monitoring.model.NetworkTraffic;
+import de.upb.upbmonitor.model.NetworkTraffic;
 import android.content.Context;
 import android.net.TrafficStats;
 

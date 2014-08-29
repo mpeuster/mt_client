@@ -1,6 +1,6 @@
 package de.upb.upbmonitor.service;
 
-import de.upb.upbmonitor.monitoring.model.UeContext;
+import de.upb.upbmonitor.model.UeContext;
 import de.upb.upbmonitor.network.NetworkManager;
 import de.upb.upbmonitor.rest.UeEndpoint;
 import android.app.Service;

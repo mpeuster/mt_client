@@ -1,4 +1,4 @@
-package de.upb.upbmonitor.monitoring.model;
+package de.upb.upbmonitor.model;
 
 import java.util.HashMap;
 import java.util.Map;
