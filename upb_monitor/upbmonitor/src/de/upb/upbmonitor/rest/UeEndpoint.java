@@ -53,6 +53,10 @@ public class UeEndpoint
 					// set URI in model
 					UeContext c = UeContext.getInstance();
 					c.setURI(temp.get(0).toString());
+					// reset model:
+					// set current assignment to none
+					UeContext.getInstance().setAssignedApURI("none");
+					
 					Log.i(LTAG, "Registered with URI: " + c.getURI());
 				} catch (Exception e)
 				{

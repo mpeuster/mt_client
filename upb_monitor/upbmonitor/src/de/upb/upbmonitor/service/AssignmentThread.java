@@ -39,7 +39,7 @@ public class AssignmentThread implements Runnable
 
 		if (isConnectionChangeNeeded(assignedApBackend, assignedApCurrent))
 		{
-			Log.i(LTAG, "Connection change needed!" + "Backend: "
+			Log.i(LTAG, "Connection change needed!" + " Backend: "
 					+ assignedApBackend + " / Current: " + assignedApCurrent);
 			UeContext.getInstance().setAssignedApURI(assignedApBackend);
 			// TODO implement assignment logic
@@ -65,7 +65,7 @@ public class AssignmentThread implements Runnable
 		{
 			// no ap assigned
 			if (backend_data.get("assigned_accesspoint") == null)
-				return null;
+				return "none";
 			// ap assigned, return URI as string
 			return backend_data.get("assigned_accesspoint").toString();
 		} catch (Exception e)
@@ -80,8 +80,12 @@ public class AssignmentThread implements Runnable
 	{
 		// null case
 		if (ap_backend == null || ap_current == null)
-			return (ap_backend != ap_current);
-
+			return false;
+		
+		// null as string case (strange!?)
+		if (ap_backend.equals("null") || ap_current.equals("null"))
+			return false;
+		
 		// string case
 		return !ap_backend.equals(ap_current);
 	}

@@ -74,7 +74,7 @@ public class UeContext
 		if(this.myContext == null)
 			return null;
 		SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this.myContext);
-		return p.getString("pref_assigned_ap_URI", null);
+		return p.getString("pref_assigned_ap_URI", "none");
 	}
 	
 	public synchronized void setAssignedApURI(String mURI)
