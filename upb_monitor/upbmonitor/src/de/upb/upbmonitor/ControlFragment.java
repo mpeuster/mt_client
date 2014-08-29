@@ -42,7 +42,8 @@ public class ControlFragment extends Fragment
 	private ImageView imageWifiStatus;
 
 	private Handler mHandler = new Handler();
-	private int updateTries = 0;
+	// enable only after dual network switch even, initial: bigger than max_retry!
+	private int updateTries = MAX_RETRY_BEFORE_SWITCH_RESET + 1; 
 	private static final int MAX_RETRY_BEFORE_SWITCH_RESET = 10;
 
 	/**
@@ -67,9 +68,8 @@ public class ControlFragment extends Fragment
 				// enable switch (fallback)
 				switchDualNetworking.setEnabled(true);
 			}
-			
-			
-			if(isVisible())
+
+			if (isVisible())
 			{
 				// get network status
 				NetworkManager nm = NetworkManager.getInstance();
@@ -77,12 +77,13 @@ public class ControlFragment extends Fragment
 				boolean wifi_state = nm.isWiFiInterfaceEnabled();
 				String mobile_ip = nm.getMobileInterfaceIp();
 				String wifi_ip = nm.getWiFiInterfaceIp();
-	
+
 				// update network status output
-				updateNetworkStatus(mobile_state, mobile_ip, wifi_state, wifi_ip,
-						nm.getCurrentSsid());
-	
-				// if status is not equal try inputs, try to check again after some
+				updateNetworkStatus(mobile_state, mobile_ip, wifi_state,
+						wifi_ip, nm.getCurrentSsid());
+
+				// if status is not equal try inputs, try to check again after
+				// some
 				// time
 				if (mobile_state == switchDualNetworking.isChecked()
 						&& wifi_state == switchDualNetworking.isChecked())
@@ -178,7 +179,8 @@ public class ControlFragment extends Fragment
 				&& this.checkBusyBoxAvailability());
 
 		// kick off periodic update task
-		mHandler.removeCallbacks(periodicGuiUpdateTask); // remove old one if existing
+		mHandler.removeCallbacks(periodicGuiUpdateTask); // remove old one if
+															// existing
 		mHandler.postDelayed(periodicGuiUpdateTask, 0);
 
 		return rootView;
@@ -189,11 +191,12 @@ public class ControlFragment extends Fragment
 	 */
 	public void startMonitoringService()
 	{
-		if(!ManagementService.SERVICE_EXISTS)
+		if (!ManagementService.SERVICE_EXISTS)
 		{
 			// force reset of model
 			UeContext.getInstance().setApplicationContext(getActivity());
-			UeContext.getInstance().setURI(null);;
+			UeContext.getInstance().setURI(null);
+			;
 			UeContext.getInstance().setAssignedApURI("none");
 		}
 		// start service
