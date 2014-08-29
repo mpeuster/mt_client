@@ -42,6 +42,7 @@ public class AssignmentController
 	{
 		UeEndpoint ue = new UeEndpoint(this.backendhost, this.backendport);
 		ue.get();
+		// TODO implement!!!
 		return null;
 	}
 	

@@ -54,4 +54,9 @@ public class MonitoringThread implements Runnable
 		UeContext c = UeContext.getInstance();
 		c.incrementUpdateCount();
 	}
+	
+	public synchronized Handler getHandler()
+	{
+		return this.myHandler;
+	}
 }

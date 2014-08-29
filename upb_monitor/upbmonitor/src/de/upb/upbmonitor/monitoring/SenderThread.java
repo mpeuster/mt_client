@@ -102,4 +102,9 @@ public class SenderThread implements Runnable
 		// remove UE from backend
 		this.restUeEndpoint.remove();
 	}
+	
+	public synchronized Handler getHandler()
+	{
+		return this.myHandler;
+	}
 }

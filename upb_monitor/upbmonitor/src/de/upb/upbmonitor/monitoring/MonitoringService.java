@@ -8,6 +8,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -22,8 +23,10 @@ public class MonitoringService extends Service
 	private static String BACKEND_HOST;
 	private static int BACKEND_PORT;
 
-	private Handler threadHandler = new Handler();
+	private HandlerThread monitoringThread;
 	private MonitoringThread monitoringTask = null;
+
+	private HandlerThread sendingThread;
 	private SenderThread sendingTask = null;
 
 	@Override
@@ -39,8 +42,13 @@ public class MonitoringService extends Service
 	{
 		super.onDestroy();
 		Log.d(LTAG, "onDestroy()");
-		threadHandler.removeCallbacks(monitoringTask);
-		threadHandler.removeCallbacks(sendingTask);
+
+		monitoringTask.getHandler().removeCallbacks(monitoringTask);
+		monitoringThread.quit();
+
+		sendingTask.getHandler().removeCallbacks(sendingTask);
+		sendingThread.quit();
+
 		sendingTask.removeUe(); // attention not async!
 		SERVICE_EXISTS = false;
 	}
@@ -60,7 +68,8 @@ public class MonitoringService extends Service
 			SENDING_INTERVAL = Integer.valueOf(preferences.getString(
 					"pref_sending_interval", "0"));
 			// backend API destination preferences
-			BACKEND_HOST = preferences.getString("pref_backend_api_address", null);
+			BACKEND_HOST = preferences.getString("pref_backend_api_address",
+					null);
 			BACKEND_PORT = Integer.valueOf(preferences.getString(
 					"pref_backend_api_port", "5000"));
 		} catch (Exception e)
@@ -73,28 +82,33 @@ public class MonitoringService extends Service
 			MONITORING_INTERVAL = 1000;
 			SENDING_INTERVAL = 5000;
 		}
-		
+
 		// initialize context model
 		this.initializeContext();
 
-		// run service's tasks
-		if (!threadHandler.hasMessages(0))
-		{
-			// configure assignment controller
-			AssignmentController.getInstance().updateConfiguration(BACKEND_HOST, BACKEND_PORT);
-			
-			// start monitoring task
-			this.monitoringTask = new MonitoringThread(this,
-					this.threadHandler, MONITORING_INTERVAL);
-			threadHandler.postDelayed(monitoringTask, 0);
-			Log.d(LTAG, "Monitoring task started");
+		// configure assignment controller
+		AssignmentController.getInstance().updateConfiguration(BACKEND_HOST,
+				BACKEND_PORT);
 
-			// start sender task
-			this.sendingTask = new SenderThread(this, this.threadHandler,
-					SENDING_INTERVAL, BACKEND_HOST, BACKEND_PORT);
-			threadHandler.postDelayed(sendingTask, 0);
-			Log.d(LTAG, "Sender task started");
-		}
+		// start monitoring task (independent looper thread)
+		this.monitoringThread = new HandlerThread("MonitoringThread");
+		this.monitoringThread.start();
+		this.monitoringTask = new MonitoringThread(this, new Handler(
+				this.monitoringThread.getLooper()), MONITORING_INTERVAL);
+		// kick off monitoring
+		this.monitoringTask.getHandler().postDelayed(monitoringTask, 0);
+		Log.d(LTAG, "Monitoring task started");
+
+		// start sender task (independent looper thread)
+		this.sendingThread = new HandlerThread("SendingThread");
+		this.sendingThread.start();
+		this.sendingTask = new SenderThread(this, new Handler(
+				this.sendingThread.getLooper()), SENDING_INTERVAL,
+				BACKEND_HOST, BACKEND_PORT);
+		// kick off sending
+		this.sendingTask.getHandler().postDelayed(sendingTask, 0);
+		Log.d(LTAG, "Sender task started");
+
 		// start sticky, so service will be restarted if it is killed
 		return Service.START_STICKY;
 	}
