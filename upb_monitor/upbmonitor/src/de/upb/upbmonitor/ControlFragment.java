@@ -189,6 +189,13 @@ public class ControlFragment extends Fragment
 	 */
 	public void startMonitoringService()
 	{
+		if(!ManagementService.SERVICE_EXISTS)
+		{
+			// force reset of model
+			UeContext.getInstance().setApplicationContext(getActivity());
+			UeContext.getInstance().setURI(null);;
+			UeContext.getInstance().setAssignedApURI("none");
+		}
 		// start service
 		Intent i = new Intent(this.getActivity(), ManagementService.class);
 		this.getActivity().startService(i);

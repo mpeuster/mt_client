@@ -65,11 +65,14 @@ public class AssignmentThread implements Runnable
 			return null;
 		try
 		{
+			String backend_ap_uri = backend_data.getString("assigned_accesspoint");
 			// no ap assigned
-			if (backend_data.get("assigned_accesspoint") == null)
+			if (backend_ap_uri == null)
+				return "none";
+			if (backend_ap_uri.equals("null"))
 				return "none";
 			// ap assigned, return URI as string
-			return backend_data.get("assigned_accesspoint").toString();
+			return backend_ap_uri;
 		} catch (Exception e)
 		{
 			Log.e(LTAG, "Could not fetch assignment from backend data.");
@@ -82,10 +85,6 @@ public class AssignmentThread implements Runnable
 	{
 		// null case
 		if (ap_backend == null || ap_current == null)
-			return false;
-		
-		// null as string case (strange!?)
-		if (ap_backend.equals("null") || ap_current.equals("null"))
 			return false;
 		
 		// string case
