@@ -23,11 +23,14 @@ public class ManagementService extends Service
 	private static String BACKEND_HOST;
 	private static int BACKEND_PORT;
 
-	private HandlerThread monitoringThread;
-	private MonitoringThread monitoringTask = null;
+	private HandlerThread monitorThread;
+	private MonitoringThread monitorTask = null;
 
-	private HandlerThread sendingThread;
-	private SenderThread sendingTask = null;
+	private HandlerThread senderThread;
+	private SenderThread senderTask = null;
+	
+	private HandlerThread receiverThread;
+	private ReceiverThread receiverTask = null;
 
 	@Override
 	public void onCreate()
@@ -43,14 +46,19 @@ public class ManagementService extends Service
 		super.onDestroy();
 		Log.d(LTAG, "onDestroy()");
 
-		monitoringTask.getHandler().removeCallbacks(monitoringTask);
-		monitoringThread.quit();
+		monitorTask.getHandler().removeCallbacks(monitorTask);
+		monitorThread.quit();
 
-		sendingTask.getHandler().removeCallbacks(sendingTask);
-		sendingThread.quit();
+		senderTask.getHandler().removeCallbacks(senderTask);
+		senderThread.quit();
+		
+		receiverTask.getHandler().removeCallbacks(receiverTask);
+		receiverThread.quit();
 
-		sendingTask.removeUe(); // attention not async!
+		senderTask.removeUe(); // attention not async!
 		SERVICE_EXISTS = false;
+		
+		Log.i(LTAG, "Management service and its worker thrads successfully stopped.");
 	}
 
 	@Override
@@ -91,24 +99,34 @@ public class ManagementService extends Service
 				BACKEND_PORT);
 
 		// start monitoring task (independent looper thread)
-		this.monitoringThread = new HandlerThread("MonitoringThread");
-		this.monitoringThread.start();
-		this.monitoringTask = new MonitoringThread(this, new Handler(
-				this.monitoringThread.getLooper()), MONITORING_INTERVAL);
+		this.monitorThread = new HandlerThread("MonitorThread");
+		this.monitorThread.start();
+		this.monitorTask = new MonitoringThread(this, new Handler(
+				this.monitorThread.getLooper()), MONITORING_INTERVAL);
 		// kick off monitoring
-		this.monitoringTask.getHandler().postDelayed(monitoringTask, 0);
-		Log.d(LTAG, "Monitoring task started");
+		this.monitorTask.getHandler().postDelayed(monitorTask, 0);
 
 		// start sender task (independent looper thread)
-		this.sendingThread = new HandlerThread("SendingThread");
-		this.sendingThread.start();
-		this.sendingTask = new SenderThread(this, new Handler(
-				this.sendingThread.getLooper()), SENDING_INTERVAL,
+		this.senderThread = new HandlerThread("SenderThread");
+		this.senderThread.start();
+		this.senderTask = new SenderThread(this, new Handler(
+				this.senderThread.getLooper()), SENDING_INTERVAL,
 				BACKEND_HOST, BACKEND_PORT);
 		// kick off sending
-		this.sendingTask.getHandler().postDelayed(sendingTask, 0);
-		Log.d(LTAG, "Sender task started");
-
+		this.senderTask.getHandler().postDelayed(senderTask, 0);
+				
+		// start receiver task (independent looper thread)
+		// TODO: use push notification to trigger receiver task, instead of active polling
+		this.receiverThread = new HandlerThread("ReceiverThread");
+		this.receiverThread.start();
+		this.receiverTask = new ReceiverThread(new Handler(
+				this.receiverThread.getLooper()), 2000,
+				BACKEND_HOST, BACKEND_PORT);
+		// kick off receiving
+		this.receiverTask.getHandler().postDelayed(receiverTask, 0);
+		
+		Log.i(LTAG, "Management service and its worker thrads successfully started.");
+		
 		// start sticky, so service will be restarted if it is killed
 		return Service.START_STICKY;
 	}

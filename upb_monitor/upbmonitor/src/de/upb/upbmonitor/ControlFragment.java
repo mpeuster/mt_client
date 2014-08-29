@@ -206,7 +206,6 @@ public class ControlFragment extends Fragment
 		this.getActivity().startService(i);
 		// set switch state
 		this.switchMonitoringService.setChecked(true);
-		Log.i(LTAG, "Monitoring service turned on");
 	}
 
 	/**
@@ -218,7 +217,6 @@ public class ControlFragment extends Fragment
 		this.getActivity().stopService(i);
 		// set switch state
 		this.switchMonitoringService.setChecked(false);
-		Log.i(LTAG, "Monitoring service turned off");
 	}
 
 	/**

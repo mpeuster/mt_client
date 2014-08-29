@@ -70,7 +70,7 @@ public class RestAsyncRequest extends AsyncTask<Void, Void, HttpResponse>
 			r.setHeader("Content-type", "application/json");
 			HttpClient c = new DefaultHttpClient();
 
-			Log.i(LTAG, "HttpRequestUrl:" + r.getURI().toString());
+			Log.v(LTAG, "HttpRequestUrl:" + r.getURI().toString());
 			HttpResponse response = c.execute(r);
 			return response;
 		} catch (ClientProtocolException e)

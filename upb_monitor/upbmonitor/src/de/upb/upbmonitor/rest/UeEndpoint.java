@@ -61,6 +61,7 @@ public class UeEndpoint
 			}
 		}
 		;
+		// perform request
 		UePostRequest r = new UePostRequest();
 		r.setup(RequestType.POST, this.mUrl + "/api/ue", UeContext
 				.getInstance().toJson().toString());
@@ -86,10 +87,17 @@ public class UeEndpoint
 							+ response.getStatusLine().getStatusCode());
 					return;
 				}
-				Log.i(LTAG, "UE was succesfully updatet in backend.");
+				Log.d(LTAG, "PUT: " + UeContext.getInstance().getURI());
 			}
 		}
 		;
+		// check if we are already registered in backend? Otherwise skip this request.
+		if(UeContext.getInstance().getURI() == null)
+		{
+			Log.w(LTAG, "Skipping PUT request, because UE is not yet registered in backend");
+			return;
+		}
+		// perform request
 		UeUpdateRequest r = new UeUpdateRequest();
 		r.setup(RequestType.PUT, this.mUrl
 				+ UeContext.getInstance().getURI(), UeContext.getInstance()
@@ -99,7 +107,6 @@ public class UeEndpoint
 
 	public void get()
 	{
-		Log.w(LTAG, "GET operation not yet implemented");
 		class UeGetRequest extends RestAsyncRequest
 		{
 			@Override
@@ -131,10 +138,17 @@ public class UeEndpoint
 				{
 					e.printStackTrace();
 				}
-				Log.i(LTAG, "UE data was successfully fetched from backend.");
+				Log.d(LTAG, "GET: " + UeContext.getInstance().getURI());
 			}
 		}
 		;
+		// check if we are already registered in backend? Otherwise skip this request.
+		if(UeContext.getInstance().getURI() == null)
+		{
+			Log.w(LTAG, "Skipping GET request, because UE is not yet registered in backend");
+			return;
+		}
+		// perform request
 		UeGetRequest r = new UeGetRequest();
 		r.setup(RequestType.GET, this.mUrl
 				+ UeContext.getInstance().getURI(), null);
@@ -167,6 +181,13 @@ public class UeEndpoint
 			}
 		}
 		;
+		// check if we are already registered in backend? Otherwise skip this request.
+		if(UeContext.getInstance().getURI() == null)
+		{
+			Log.w(LTAG, "Skipping DELETE request, because UE is not yet registered in backend");
+			return;
+		}
+		// perform request
 		UeDeleteRequest r = new UeDeleteRequest();
 		r.setup(RequestType.DELETE, this.mUrl
 				+ UeContext.getInstance().getURI(), null);

@@ -10,10 +10,6 @@ import de.upb.upbmonitor.rest.UeEndpoint;
 
 /**
  * Represents the sender thread of the service.
- * 
- * Attention: This Runnable/Handler implementation is the way to do periodic
- * tasks in Android. Do not use Java timers. However its a bit ugly.
- * 
  * @author manuel
  * 
  */
@@ -27,12 +23,12 @@ public class SenderThread implements Runnable
 	private boolean shuldBeConnected = false;
 
 	public SenderThread(Context myContext, Handler myHandler,
-			int monitoringInterval, String backendHost, int backendPort)
+			int interval, String backendHost, int backendPort)
 	{ 
 		// arguments
 		this.myContext = myContext;
 		this.myHandler = myHandler;
-		this.mSenderInterval = monitoringInterval;
+		this.mSenderInterval = interval;
 		
 		// also pass context to model
 		UeContext.getInstance().updateApplicationContext(myContext);
