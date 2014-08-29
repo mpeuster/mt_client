@@ -179,7 +179,7 @@ public class NetworkManager
 		// get SSID (always use last output)
 		String ssid = out.get(out.size() - 1);
 
-		Log.d(LTAG, "Current SSID: " + ssid);
+		Log.v(LTAG, "Current SSID: " + ssid);
 
 		return ssid;
 	}
@@ -292,7 +292,7 @@ public class NetworkManager
 				// check for active WiFi route
 				if (!rm.routeExists("default", null, WIFI_INTERFACE))
 					Log.e(LTAG, "ATTENTION: WiFi default route not found.");
-				// TODO (optional): Maybe create a new default WiFi route if not
+				// OPTIONAL: Maybe create a new default WiFi route if not
 				// present
 			}
 		}
@@ -325,7 +325,7 @@ public class NetworkManager
 		if (status == null || status.size() < 2)
 			return null;
 
-		Log.d(LTAG, "Interface IP of " + interfaceName + ": " + status.get(2));
+		Log.v(LTAG, "Interface IP of " + interfaceName + ": " + status.get(2));
 
 		// return IP field
 		return status.get(2);
@@ -338,7 +338,7 @@ public class NetworkManager
 		if (status == null || status.size() < 2)
 			return null;
 
-		Log.d(LTAG, "Interface MAC of " + interfaceName + ": " + status.get(4));
+		Log.v(LTAG, "Interface MAC of " + interfaceName + ": " + status.get(4));
 
 		// return IP field
 		return status.get(4);
@@ -351,7 +351,7 @@ public class NetworkManager
 		if (status == null || status.size() < 2)
 			return false;
 
-		Log.d(LTAG,
+		Log.v(LTAG,
 				"Interface state of " + interfaceName + ": " + status.get(1));
 
 		// check against state field

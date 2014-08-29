@@ -31,14 +31,14 @@
                 android:id="@+id/switch_monitoringservice"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Monitoring Service" />
+                android:text="Management Service" />
 
             <TextView
                 android:id="@+id/textViewMonitoringStatus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="8dp"
-                android:text="The monitoring service runs in the background and measures UE activity. It automatically sends these information to the testbed backend."
+                android:text="The management service runs in background and measures UE activity. It automatically sends these information to the testbed backend. If the backend assigns the UE to a new Wi-Fi AP, the service will trigger the re-connection process."
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
         </LinearLayout>

@@ -55,13 +55,13 @@ public class ControlFragment extends Fragment
 	{
 		public void run()
 		{
-			Log.d(LTAG, "Update task run: " + updateTries);
+			Log.v(LTAG, "Control fragment update task run: " + updateTries);
 			// count number of tries
 			updateTries++;
 			// check for try count
 			if (updateTries > MAX_RETRY)
 			{
-				Log.e(LTAG, "Update task has reached MAX_RETRY.");
+				Log.w(LTAG, "Update task has reached MAX_RETRY.");
 				// enable switch (fallback)
 				switchDualNetworking.setEnabled(true);
 				// reset and stop runnable
