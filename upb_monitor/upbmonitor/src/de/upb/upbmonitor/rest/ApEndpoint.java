@@ -100,7 +100,7 @@ public class ApEndpoint
 					String json_string;
 					json_string = EntityUtils.toString(response.getEntity());
 					JSONObject temp = new JSONObject(json_string);
-					// store received AP to model
+					// store received AP in model
 					ApModel.getInstance().addAp(temp);
 				} catch (Exception e)
 				{

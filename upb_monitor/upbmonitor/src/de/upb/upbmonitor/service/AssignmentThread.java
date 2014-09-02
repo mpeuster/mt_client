@@ -3,6 +3,7 @@ package de.upb.upbmonitor.service;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import de.upb.upbmonitor.model.ApModel;
 import de.upb.upbmonitor.model.UeContext;
 import android.os.Handler;
 import android.util.Log;
@@ -42,9 +43,28 @@ public class AssignmentThread implements Runnable
 			Log.i(LTAG, "Connection change needed!" + " Backend: "
 					+ assignedApBackend + " / Current: " + assignedApCurrent);
 			UeContext.getInstance().setAssignedApURI(assignedApBackend);
-			// TODO implement assignment logic
-			// 1. fetch AP information
-			// 2. toggle WiFi re-connect
+
+			
+			if(assignedApBackend == null || assignedApBackend.equals("none"))
+			{
+				// No AP assigned by backend: disconnect from Wi-Fi
+			}
+			else
+			{
+				// fetch information about assigned Wi-Fi
+				String SSID = ApModel.getInstance().getSsid(assignedApBackend);
+				String PSK = ApModel.getInstance().getPsk(assignedApBackend);
+				if(SSID == null)
+					Log.e(LTAG, "AP without SSID assigned!");
+								
+				// connect new assigned Wi-Fi
+				Log.d(LTAG, "Trying to connect to Wi-Fi: " + SSID);
+				
+			}
+			
+			// set current Wi-Fi to backend Wi-Fi
+			// TODO check for success?
+			UeContext.getInstance().setAssignedApURI(assignedApBackend);
 		}
 
 		// re-schedule

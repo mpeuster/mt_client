@@ -47,8 +47,7 @@ public class ApModel
 			Log.e(LTAG, "Error while adding AP to model.");
 		}
 	}
-	
-	
+		
 	/**
 	 * Removes all APs from model.
 	 */
@@ -56,4 +55,42 @@ public class ApModel
 	{
 		this.mApList.clear();
 	}
+	
+	/**
+	 * Get SSID for AP identified by its API URL.
+	 * @param url
+	 * @return
+	 */
+	public synchronized String getSsid(String url)
+	{
+		try
+		{
+			return this.mApList.get(url).getString("ssid");
+		} catch (Exception e)
+		{
+			Log.e(LTAG, "Could not get AP value from model.");
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * Get PSK for AP identified by its API URL.
+	 * @param url
+	 * @return
+	 */
+	public synchronized String getPsk(String url)
+	{
+		try
+		{
+			return this.mApList.get(url).getString("psk");
+		} catch (Exception e)
+		{
+			Log.e(LTAG, "Could not get AP value from model.");
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	
 }

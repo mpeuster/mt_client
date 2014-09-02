@@ -185,6 +185,7 @@ public class UeEndpoint
 				// result code looks fine, reset model
 				UeContext c = UeContext.getInstance();
 				c.setURI(null);
+				c.setAssignedApURI("none");
 				ApModel.getInstance().clear();
 				Log.i(LTAG, "UE was succesfully removed from backend. Model cleared.");
 			}
