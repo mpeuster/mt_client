@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.util.Log;
+import de.upb.upbmonitor.model.ApModel;
 import de.upb.upbmonitor.model.UeContext;
 import de.upb.upbmonitor.rest.RestAsyncRequest.RequestType;
 
@@ -17,11 +18,14 @@ public class UeEndpoint
 {
 	private static final String LTAG = "UeEndpoint";
 	private String mUrl;
+	private ApEndpoint mRestApEndpoint; // used to fetch AP data after registration
 
 	public UeEndpoint(String host, int port)
 	{
 		this.mUrl = "http://" + host + ":" + port;
-		Log.v(LTAG, "Created endpoint: " + this.mUrl);
+		Log.i(LTAG, "Created endpoint: " + this.mUrl);
+		// create also AP endpoint
+		this.mRestApEndpoint = new ApEndpoint(host, port);
 	}
 
 	public void register()
@@ -52,9 +56,12 @@ public class UeEndpoint
 					JSONArray temp = new JSONArray(json_string);
 					// set URI in model
 					UeContext c = UeContext.getInstance();
-					c.setURI(temp.get(0).toString());
-					
+					c.setURI(temp.get(0).toString());					
 					Log.i(LTAG, "Registered with URI: " + c.getURI());
+					
+					// now fetch all AP information from system
+					mRestApEndpoint.fetchApData();
+					
 				} catch (Exception e)
 				{
 					e.printStackTrace();
@@ -178,7 +185,8 @@ public class UeEndpoint
 				// result code looks fine, reset model
 				UeContext c = UeContext.getInstance();
 				c.setURI(null);
-				Log.i(LTAG, "UE was succesfully removed from backend.");
+				ApModel.getInstance().clear();
+				Log.i(LTAG, "UE was succesfully removed from backend. Model cleared.");
 			}
 		}
 		;
