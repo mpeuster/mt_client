@@ -225,7 +225,7 @@ public class NetworkManager
 		Shell.execute("ndc resolver setdefaultif " + default_interface);
 
 		Log.d(LTAG, "Changed DNS server to: " + ip + " and " + ip2
-				+ "with defaultif: " + default_interface);
+				+ " with defaultif: " + default_interface);
 	}
 
 	/**
