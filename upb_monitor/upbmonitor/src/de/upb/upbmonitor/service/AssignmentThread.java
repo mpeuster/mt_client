@@ -58,12 +58,15 @@ public class AssignmentThread implements Runnable
 			{
 				// fetch information about assigned Wi-Fi
 				String SSID = ApModel.getInstance().getSsid(assignedApBackend);
-				String PSK = ApModel.getInstance().getPsk(assignedApBackend);
+				//String PSK = ApModel.getInstance().getPsk(assignedApBackend);
+				String BSSID = ApModel.getInstance().getBssid(assignedApBackend);
 				if(SSID == null)
 					Log.e(LTAG, "AP without SSID assigned!");
+				if(BSSID == null)
+					Log.e(LTAG, "AP without BSSID assigned!");
 								
 				// connect new assigned Wi-Fi
-				Log.d(LTAG, "Trying to connect to Wi-Fi: " + SSID);
+				Log.i(LTAG, "Trying to connect to Wi-Fi: " + SSID + " using BSSID: " + BSSID);
 				
 				// switch DNS
 				nm.setDnsServer("8.8.8.8", "8.8.4.4", NetworkManager.WIFI_INTERFACE);

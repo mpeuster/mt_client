@@ -92,7 +92,7 @@ public class NetworkManager
 
 		// -- connection procedure
 		// stop dhcp client
-		Shell.execute("pkill dhcpcd");
+		//Shell.execute("pkill dhcpcd");
 		// kill wifi management
 		Shell.execute("pkill wpa_supplicant");
 		// configure target wifi (copy indiv. config to destination)
@@ -101,7 +101,8 @@ public class NetworkManager
 		// connect to actual wifi
 		Shell.execute("wpa_supplicant -B -Dnl80211 -iwlan0 -c/data/misc/wifi/wpa_supplicant.conf");
 		// bring up dhcp client and receive ip (takes some time!)
-		Shell.execute("dhcpcd wlan0");
+		//Shell.execute("dhcpcd wlan0");
+		Shell.execute("netcfg wlan0 dhcp");
 		// run custom callback command to trigger setup after connection is
 		// established and IP is received
 		Shell.executeCustom(this.eventAfterWifiConnected);
@@ -116,7 +117,7 @@ public class NetworkManager
 	{
 		Log.i(LTAG, "Disabling dual networking");
 		// kill dhcp client
-		Shell.execute("pkill dhcpcd");
+		//Shell.execute("pkill dhcpcd");
 		// kill wifi management
 		Shell.execute("pkill wpa_supplicant");
 		// tear down wifi interface

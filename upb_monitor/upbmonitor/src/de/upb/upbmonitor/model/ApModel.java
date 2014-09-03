@@ -75,6 +75,24 @@ public class ApModel
 	}
 	
 	/**
+	 * Get BSSID for AP identified by its API URL.
+	 * @param url
+	 * @return
+	 */
+	public synchronized String getBssid(String url)
+	{
+		try
+		{
+			return this.mApList.get(url).getString("bssid");
+		} catch (Exception e)
+		{
+			Log.e(LTAG, "Could not get AP value from model.");
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
 	 * Get PSK for AP identified by its API URL.
 	 * @param url
 	 * @return
