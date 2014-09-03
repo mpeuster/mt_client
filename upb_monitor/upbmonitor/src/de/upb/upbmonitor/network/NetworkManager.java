@@ -459,7 +459,7 @@ public class NetworkManager
 		return this.getIpByHostname(hostname);
 	}
 
-	private String getIpByHostname(String hostname)
+	public String getIpByHostname(String hostname)
 	{
 		ArrayList<String> out = Shell.executeBlocking("nslookup " + hostname
 				+ " | grep \"Address 1\" | cut -d \" \" -f3");

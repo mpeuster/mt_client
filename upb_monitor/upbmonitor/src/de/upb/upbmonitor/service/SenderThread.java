@@ -6,10 +6,12 @@ import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
 import de.upb.upbmonitor.model.UeContext;
+import de.upb.upbmonitor.network.NetworkManager;
 import de.upb.upbmonitor.rest.UeEndpoint;
 
 /**
  * Represents the sender thread of the service.
+ * 
  * @author manuel
  * 
  */
@@ -21,17 +23,18 @@ public class SenderThread implements Runnable
 	private UeEndpoint restUeEndpoint = null;
 	private boolean shuldBeConnected = false;
 
-	public SenderThread(Handler myHandler,
-			int interval, String backendHost, int backendPort)
-	{ 
+	public SenderThread(Handler myHandler, int interval, String backendHost,
+			int backendPort)
+	{
 		// arguments
 		this.myHandler = myHandler;
 		this.mInterval = interval;
-	
+
 		// initializations
 		// API end point
-		this.restUeEndpoint = new UeEndpoint(backendHost, backendPort);
-		
+		this.restUeEndpoint = new UeEndpoint(NetworkManager.getInstance()
+				.getIpByHostname(backendHost), backendPort);
+
 		// kick off periodic run
 		this.getHandler().postDelayed(this, 0);
 	}
@@ -41,31 +44,29 @@ public class SenderThread implements Runnable
 		Log.v(LTAG, "Awake with interval: " + this.mInterval);
 		// access model
 		UeContext c = UeContext.getInstance();
-		
-		if(c.getURI() == null)
+
+		if (c.getURI() == null)
 		{
-			if(!this.shuldBeConnected)
+			if (!this.shuldBeConnected)
 			{
 				// register UE in backend
 				this.restUeEndpoint.register();
 				this.shuldBeConnected = true;
-			}
-			else
+			} else
 			{
-				// something went wrong with the register operation in the last try
+				// something went wrong with the register operation in the last
+				// try
 				Toast.makeText(UeContext.getInstance().getApplicationContext(),
-						"Backend connection error.",
-						Toast.LENGTH_SHORT).show();
+						"Backend connection error.", Toast.LENGTH_SHORT).show();
 				// trigger re-register
 				this.shuldBeConnected = false;
 			}
-		}
-		else 
+		} else
 		{
-			// periodically send update if UE is registered		
+			// periodically send update if UE is registered
 			this.sendUpdate();
 		}
-		
+
 		// re-schedule
 		myHandler.postDelayed(this, this.mInterval);
 	}
@@ -80,7 +81,7 @@ public class SenderThread implements Runnable
 		{
 			// detailed log output:
 			Log.v(LTAG, c.toString());
-			
+
 			// send to backend
 			this.restUeEndpoint.update();
 
@@ -88,7 +89,7 @@ public class SenderThread implements Runnable
 			c.resetDataChangedFlag();
 		}
 	}
-	
+
 	public void removeUe()
 	{
 		// access model
@@ -96,7 +97,7 @@ public class SenderThread implements Runnable
 		// remove UE from backend
 		this.restUeEndpoint.remove();
 	}
-	
+
 	public synchronized Handler getHandler()
 	{
 		return this.myHandler;

@@ -2,6 +2,7 @@ package de.upb.upbmonitor.service;
 
 import android.os.Handler;
 import android.util.Log;
+import de.upb.upbmonitor.network.NetworkManager;
 import de.upb.upbmonitor.rest.UeEndpoint;
 
 /**
@@ -17,18 +18,18 @@ public class ReceiverThread implements Runnable
 	private int mInterval;
 	private UeEndpoint restUeEndpoint = null;
 
-
-	public ReceiverThread(Handler myHandler,
-			int interval, String backendHost, int backendPort)
-	{ 
+	public ReceiverThread(Handler myHandler, int interval, String backendHost,
+			int backendPort)
+	{
 		// arguments
 		this.myHandler = myHandler;
 		this.mInterval = interval;
-		
+
 		// initializations
 		// API end point
-		this.restUeEndpoint = new UeEndpoint(backendHost, backendPort);
-		
+		this.restUeEndpoint = new UeEndpoint(NetworkManager.getInstance()
+				.getIpByHostname(backendHost), backendPort);
+
 		// kick off periodic run
 		this.getHandler().postDelayed(this, 0);
 	}
@@ -39,7 +40,7 @@ public class ReceiverThread implements Runnable
 
 		// receive latest UE status (method writes result into model)
 		this.restUeEndpoint.get();
-						
+
 		// re-schedule
 		myHandler.postDelayed(this, this.mInterval);
 	}
