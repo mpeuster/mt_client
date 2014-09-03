@@ -24,11 +24,11 @@ public class NetworkManager
 {
 	private static final String LTAG = "NetworkManager";
 	// this is maybe vendor specific (tested on Samsung Galaxy Nexsus):
-	private static final String WIFI_INTERFACE = "wlan0";
-	private static final String MOBILE_INTERFACE = "rmnet0";
+	public static final String WIFI_INTERFACE = "wlan0";
+	public static final String MOBILE_INTERFACE = "rmnet0";
 	private static NetworkManager INSTANCE;
 	private Context myContext = null;
-	
+
 	public void setContext(Context c)
 	{
 		this.myContext = c;
@@ -199,7 +199,8 @@ public class NetworkManager
 		return this.getProp("net." + MOBILE_INTERFACE + ".gw");
 	}
 
-	public synchronized void setDnsServer(String ip, String ip2)
+	public synchronized void setDnsServer(String ip, String ip2,
+			String default_interface)
 	{
 		// 1. for android < 4.4
 		// try to set global properties
@@ -221,9 +222,10 @@ public class NetworkManager
 		Shell.execute("ndc resolver flushdefaultif");
 		Shell.execute("ndc resolver setifdns wlan0 " + ip + " " + ip2);
 		Shell.execute("ndc resolver setifdns rmnet0 " + ip + " " + ip2);
-		Shell.execute("ndc resolver setdefaultif wlan0");
+		Shell.execute("ndc resolver setdefaultif " + default_interface);
 
-		Log.d(LTAG, "Changed DNS server to: " + ip + " and " + ip2);
+		Log.d(LTAG, "Changed DNS server to: " + ip + " and " + ip2
+				+ "with defaultif: " + default_interface);
 	}
 
 	/**
@@ -265,7 +267,7 @@ public class NetworkManager
 						+ getWiFiInterfaceIp());
 
 				// set DNS server
-				setDnsServer("8.8.8.8", "8.8.4.4");
+				setDnsServer("8.8.8.8", "8.8.4.4", WIFI_INTERFACE);
 
 				// remove default rmnet route (if present)
 				RouteManager rm = RouteManager.getInstance();
@@ -279,15 +281,17 @@ public class NetworkManager
 				}
 				// set route to backend on dev rmnet0
 				String backend_ip = getBackendIp();
-				if(backend_ip != null)
+				if (backend_ip != null)
 				{
 					Route rb = new Route(backend_ip, null, MOBILE_INTERFACE);
 					rm.addRoute(rb);
-					Log.i(LTAG, "Added route for backend IP over rmnet0: " + rb.toString());
-				}
-				else
+					Log.i(LTAG,
+							"Added route for backend IP over rmnet0: "
+									+ rb.toString());
+				} else
 				{
-					Log.e(LTAG, "Can not resolve backen IP address. Route not set.");
+					Log.e(LTAG,
+							"Can not resolve backen IP address. Route not set.");
 				}
 				// check for active WiFi route
 				if (!rm.routeExists("default", null, WIFI_INTERFACE))
@@ -447,15 +451,16 @@ public class NetworkManager
 	{
 		Shell.execute("setprop " + key + " " + value);
 	}
-	
+
 	private String getBackendIp()
 	{
-		if(this.myContext == null)
+		if (this.myContext == null)
 			return null;
 		// get preference value and do name lookup
 		SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(this.myContext);
-		String hostname = preferences.getString("pref_backend_api_address", null);
+		String hostname = preferences.getString("pref_backend_api_address",
+				null);
 		return this.getIpByHostname(hostname);
 	}
 

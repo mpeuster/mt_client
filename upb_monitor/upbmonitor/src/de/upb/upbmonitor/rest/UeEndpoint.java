@@ -187,7 +187,7 @@ public class UeEndpoint
 				c.setURI(null);
 				c.setAssignedApURI("none");
 				ApModel.getInstance().clear();
-				Log.i(LTAG, "UE was succesfully removed from backend. Model cleared.");
+				Log.i(LTAG, "Removing UE from backend. Model cleared.");
 			}
 		}
 		;

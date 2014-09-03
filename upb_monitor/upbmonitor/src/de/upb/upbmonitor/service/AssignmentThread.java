@@ -5,6 +5,7 @@ import org.json.JSONObject;
 
 import de.upb.upbmonitor.model.ApModel;
 import de.upb.upbmonitor.model.UeContext;
+import de.upb.upbmonitor.network.NetworkManager;
 import android.os.Handler;
 import android.util.Log;
 
@@ -44,10 +45,14 @@ public class AssignmentThread implements Runnable
 					+ assignedApBackend + " / Current: " + assignedApCurrent);
 			UeContext.getInstance().setAssignedApURI(assignedApBackend);
 
+			NetworkManager nm = NetworkManager.getInstance();
 			
 			if(assignedApBackend == null || assignedApBackend.equals("none"))
 			{
 				// No AP assigned by backend: disconnect from Wi-Fi
+				
+				// switch DNS
+				nm.setDnsServer("8.8.8.8", "8.8.4.4", NetworkManager.MOBILE_INTERFACE);
 			}
 			else
 			{
@@ -60,6 +65,8 @@ public class AssignmentThread implements Runnable
 				// connect new assigned Wi-Fi
 				Log.d(LTAG, "Trying to connect to Wi-Fi: " + SSID);
 				
+				// switch DNS
+				nm.setDnsServer("8.8.8.8", "8.8.4.4", NetworkManager.WIFI_INTERFACE);
 			}
 			
 			// set current Wi-Fi to backend Wi-Fi

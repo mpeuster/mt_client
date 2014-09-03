@@ -67,9 +67,7 @@ public class DebugFragment extends Fragment
 		b2.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Perform action on click
-            	Log.e(LTAG, NetworkManager.getInstance().getWifiGateway());
-            	Log.e(LTAG, NetworkManager.getInstance().getMobileGateway());
-            	NetworkManager.getInstance().setDnsServer("8.8.8.8", "8.8.4.4");
+            	
             }
         });
 		
