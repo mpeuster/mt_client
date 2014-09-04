@@ -60,26 +60,29 @@ public class DebugFragment extends Fragment
             	//NetworkManager.getInstance().getCurrentSsid();
             	//NetworkManager.getInstance().connectWiFi("webauth", null);
             	//Log.i(LTAG, NetworkManager.getInstance().getBackendIp());
-            	
+            	NetworkManager.getInstance().associateToAccessPoint("64:70:02:1a:cf:e4");
             }
         });
 		
 		b2.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Perform action on click
-            	
+            	NetworkManager.getInstance().associateToAccessPoint("64:70:02:18:7c:60");
             }
         });
 		
 		b3.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // Perform action on click        	
+                // Perform action on click   
+            	NetworkManager.getInstance().associateToAccessPoint("64:70:02:0f:f4:a0");
             }
         });
 		
 		b4.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Perform action on click
+            	//NetworkManager.getInstance().connectToAccessPoint("64:70:02:18:a0:ed");
+            	NetworkManager.getInstance().disassociateFromAccessPoint();
             }
         });
 		
