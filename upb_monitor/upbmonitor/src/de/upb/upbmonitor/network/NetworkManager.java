@@ -221,12 +221,22 @@ public class NetworkManager
 
 	public synchronized String getWifiGateway()
 	{
-		return this.getProp("dhcp." + WIFI_INTERFACE + ".gateway");
+		// not sure why, but this is not always the same, so try both:
+		String alt1 = this.getProp("dhcp." + WIFI_INTERFACE + ".gateway");
+		String alt2 = this.getProp("net." + WIFI_INTERFACE + ".gw"); 
+		if(alt1 != null)
+			return alt1;
+		return alt2;
 	}
 
 	public synchronized String getMobileGateway()
 	{
-		return this.getProp("net." + MOBILE_INTERFACE + ".gw");
+		// not sure why, but this is not always the same, so try both:
+		String alt1 = this.getProp("dhcp." + MOBILE_INTERFACE + ".gateway");
+		String alt2 = this.getProp("net." + MOBILE_INTERFACE + ".gw"); 
+		if(alt1 != null)
+			return alt1;
+		return alt2;
 	}
 
 	public synchronized void setDnsServer(String ip, String ip2,
@@ -303,9 +313,10 @@ public class NetworkManager
 				RouteManager rm = RouteManager.getInstance();
 
 				// set default route to use wlan0 (only remove the default to
+				rm.setDefaultRouteToWiFi();
 				// rmnet0)
-				rm.removeRoute(rm.getRoute("default", null,
-						NetworkManager.MOBILE_INTERFACE));
+				//rm.removeRoute(rm.getRoute("default", null,
+				//		NetworkManager.MOBILE_INTERFACE));
 
 				// set route to backend to always use dev rmnet0
 				String backend_ip = getBackendIp();
