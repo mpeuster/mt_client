@@ -254,7 +254,7 @@ public class NetworkManager
 		Shell.execute("ndc resolver setifdns rmnet0 " + ip + " " + ip2);
 		Shell.execute("ndc resolver setdefaultif " + default_interface);
 
-		Log.d(LTAG, "Changed DNS server to: " + ip + " and " + ip2
+		Log.i(LTAG, "Changed DNS server to: " + ip + " and " + ip2
 				+ " with defaultif: " + default_interface);
 	}
 
@@ -302,6 +302,11 @@ public class NetworkManager
 				// change routing
 				RouteManager rm = RouteManager.getInstance();
 
+				// set default route to use wlan0 (only remove the default to
+				// rmnet0)
+				rm.removeRoute(rm.getRoute("default", null,
+						NetworkManager.MOBILE_INTERFACE));
+
 				// set route to backend to always use dev rmnet0
 				String backend_ip = getBackendIp();
 				if (backend_ip != null)
@@ -314,11 +319,8 @@ public class NetworkManager
 				} else
 				{
 					Log.e(LTAG,
-							"Can not resolve backen IP address. Route not set.");
+							"Can not resolve backend IP address. Route not set.");
 				}
-
-				// set default route to use wlan0
-				rm.setDefaultRouteToWiFi();
 
 				// check for active WiFi route
 				if (!rm.routeExists("default", null, WIFI_INTERFACE))

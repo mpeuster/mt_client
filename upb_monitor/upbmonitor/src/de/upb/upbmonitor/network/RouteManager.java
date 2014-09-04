@@ -77,13 +77,15 @@ public class RouteManager
 
 	public synchronized void addRoute(Route r)
 	{
-		Shell.execute("ip route add " + r.toString());
+		if(r != null)
+			Shell.execute("ip route add " + r.toString());
 	}
 
 	public synchronized void removeRoute(Route r)
 	{
-		Shell.execute("ip route del " + r.toString());
-	}
+		if(r != null)
+			Shell.execute("ip route del " + r.toString());
+	}	
 
 	public synchronized boolean routeExists(String prefix, String via,
 			String dev)
