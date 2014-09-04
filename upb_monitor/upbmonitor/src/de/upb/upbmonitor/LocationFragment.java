@@ -19,7 +19,7 @@ public class LocationFragment extends Fragment
 	private static final String LTAG = "LocationFragment";
 
 	private SharedPreferences settings;
-	private Switch switchManualLocation;
+	private Switch switchManualLocation, switchVolumeLocation;
 	private NumberPicker npPositionX, npPositionY;
 	private TextView tvPH, tvPX, tvPY;
 
@@ -51,6 +51,8 @@ public class LocationFragment extends Fragment
 		// get pointers to control elements
 		this.switchManualLocation = (Switch) rootView
 				.findViewById(R.id.switchManualLocation);
+		this.switchVolumeLocation = (Switch) rootView
+				.findViewById(R.id.switchVolumeLocation);
 		this.npPositionX = (NumberPicker) rootView
 				.findViewById(R.id.npPositionX);
 		this.npPositionY = (NumberPicker) rootView
@@ -67,6 +69,8 @@ public class LocationFragment extends Fragment
 		this.switchManualLocation
 				.setChecked(this.getManualLocationPreference());
 		this.setEnableToPositionControls(this.getManualLocationPreference());
+		this.switchVolumeLocation
+				.setChecked(this.getVolumeLocationPreference());
 		this.npPositionX.setValue(this.getPositionXPreference()
 				/ positionStepSize);
 		this.npPositionY.setValue(this.getPositionYPreference()
@@ -83,10 +87,31 @@ public class LocationFragment extends Fragment
 					{
 						// store value in shared preference
 						setManualLocationPreference(isChecked);
+						setEnableToPositionControls(isChecked);
 						if (isChecked)
-							setEnableToPositionControls(true);
-						else
-							setEnableToPositionControls(false);
+						{
+							switchVolumeLocation.setChecked(false);
+							setVolumeLocationPreference(false);
+						}
+					}
+				});
+
+		// volume location switch listener
+		this.switchVolumeLocation
+				.setOnCheckedChangeListener(new OnCheckedChangeListener()
+				{
+
+					@Override
+					public void onCheckedChanged(CompoundButton buttonView,
+							boolean isChecked)
+					{
+						// store value in shared preference
+						setVolumeLocationPreference(isChecked);
+						if (isChecked)
+						{
+							switchManualLocation.setChecked(false);
+							setManualLocationPreference(false);
+						}
 					}
 				});
 
@@ -143,6 +168,29 @@ public class LocationFragment extends Fragment
 		np.setValue(min);
 	}
 
+	private void setVolumeLocationPreference(boolean b)
+	{
+		if (settings == null)
+		{
+			Log.e(LTAG, "Could not access shared preferences.");
+			return;
+		}
+		SharedPreferences.Editor e = settings.edit();
+		e.putBoolean("pref_enable_volume_location", b);
+		e.commit();
+		Log.i(LTAG, "Changed volume location enabled to: " + b);
+	}
+
+	private boolean getVolumeLocationPreference()
+	{
+		if (settings == null)
+		{
+			Log.e(LTAG, "Could not access shared preferences.");
+			return false;
+		}
+		return settings.getBoolean("pref_enable_volume_location", false);
+	}
+
 	private void setManualLocationPreference(boolean b)
 	{
 		if (settings == null)
@@ -153,7 +201,7 @@ public class LocationFragment extends Fragment
 		SharedPreferences.Editor e = settings.edit();
 		e.putBoolean("pref_enable_manual_location", b);
 		e.commit();
-		Log.v(LTAG, "Changed manual location enaqbled to: " + b);
+		Log.i(LTAG, "Changed manual location enabled to: " + b);
 	}
 
 	private boolean getManualLocationPreference()

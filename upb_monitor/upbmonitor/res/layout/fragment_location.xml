@@ -20,11 +20,34 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical"
+            android:paddingBottom="8dp" >
+
+            <Switch
+                android:id="@+id/switchVolumeLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Volume based location" />
+
+            <TextView
+                android:id="@+id/TextView01"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="8dp"
+                android:text="Uses the current volume level to switch between predefined locations. Can be helpful for demonstrations, because the location can be changed without leaving the current application."
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp" >
 
             <Switch
                 android:id="@+id/switchManualLocation"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Manual location" />
 
@@ -44,6 +67,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical"
+            android:paddingBottom="30dp"
             android:paddingTop="30dp" >
 
             <TextView

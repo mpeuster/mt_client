@@ -5,9 +5,11 @@ import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 public class SystemMonitor
 {
@@ -75,34 +77,80 @@ public class SystemMonitor
 	 */
 	public void monitorLocation()
 	{
-		boolean enabled;
+		boolean manual_enabled;
+		boolean volume_enabled;
 		int px = 0;
 		int py = 0;
 		// try to get manually set location from shared preferences
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(this.myContext);
 		try
 		{
-			SharedPreferences preferences = PreferenceManager
-					.getDefaultSharedPreferences(this.myContext);
 			// location preferences
-			enabled = preferences.getBoolean("pref_enable_manual_location",
-					false);
-			px = preferences.getInt("pref_manual_location_x", 0);
-			py = preferences.getInt("pref_manual_location_y", 0);
+			manual_enabled = preferences.getBoolean(
+					"pref_enable_manual_location", false);
+			volume_enabled = preferences.getBoolean(
+					"pref_enable_volume_location", false);
 		} catch (Exception e)
 		{
 			Log.e(LTAG, "Error reading preferences. Using default values.");
-			enabled = false;
+			manual_enabled = false;
+			volume_enabled = false;
 		}
 		// only use values if manual location is enabled
-		if (!enabled)
+		if (manual_enabled)
 		{
-			px = 0;
-			py = 0;
+			this.setManualLocationInModel(preferences);
+			return;
 		}
-		// set values in model
+		// only use values if volume location is enabled
+		if (volume_enabled)
+		{
+			this.setVolumeLocationInModel(preferences);
+			return;
+		}
+		// use default values instead
+		UeContext.getInstance().setPositionX(0);
+		UeContext.getInstance().setPositionY(0);
+	}
+
+	private void setManualLocationInModel(SharedPreferences p)
+	{
+		UeContext.getInstance().setPositionX(
+				p.getInt("pref_manual_location_x", 0));
+		UeContext.getInstance().setPositionY(
+				p.getInt("pref_manual_location_y", 0));
+	}
+
+	private void setVolumeLocationInModel(SharedPreferences p)
+	{
+		// OPTIONAL make predefined volume locations configurable
+		float[] PREDEFINED_X = { 0, 800, 0, 800 };
+		float[] PREDEFINED_Y = { 0, 0, 800, 800 };
+
+		AudioManager am = (AudioManager) myContext
+				.getSystemService(Context.AUDIO_SERVICE);
+		int lvl1 = am.getStreamVolume(AudioManager.STREAM_RING);
+		int lvl2 = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+
+		// compute predefined location index as modulo of volume levels
+		int idx = (lvl1 + lvl2)
+				% (Math.min(PREDEFINED_X.length, PREDEFINED_Y.length) - 1);
+	
 		UeContext c = UeContext.getInstance();
-		c.setPositionX(px);
-		c.setPositionY(py);
+
+		// if something changed, show a toast
+		if (c.getPositionX() != PREDEFINED_X[idx]
+				|| c.getPositionY() != PREDEFINED_Y[idx])
+		{
+			Toast.makeText(
+					myContext,
+					"Changed location to: " + PREDEFINED_X[idx] + "/"
+							+ PREDEFINED_Y[idx], Toast.LENGTH_SHORT).show();
+		}
+
+		c.setPositionX(PREDEFINED_X[idx]);
+		c.setPositionY(PREDEFINED_Y[idx]);
 	}
 
 }
