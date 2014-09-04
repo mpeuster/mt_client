@@ -114,7 +114,6 @@ public class ManagementService extends Service
 				BACKEND_HOST, BACKEND_PORT);
 				
 		// start receiver task (independent looper thread)
-		// TODO: use push notification to trigger receiver task, instead of active polling
 		this.receiverThread = new HandlerThread("ReceiverThread");
 		this.receiverThread.start();
 		this.receiverTask = new ReceiverThread(new Handler(
