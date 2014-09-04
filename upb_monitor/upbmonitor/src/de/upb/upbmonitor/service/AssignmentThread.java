@@ -70,7 +70,7 @@ public class AssignmentThread implements Runnable
 					Log.e(LTAG, "AP without SSID assigned!");
 				if(BSSID == null)
 					Log.e(LTAG, "AP without BSSID assigned!");
-								
+				else				
 				// connect new assigned Wi-Fi
 				Log.i(LTAG, "Trying to connect to Wi-Fi: " + SSID + " using BSSID: " + BSSID);
 				nm.associateToAccessPoint(BSSID);

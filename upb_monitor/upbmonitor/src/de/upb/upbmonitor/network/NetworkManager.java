@@ -79,8 +79,8 @@ public class NetworkManager
 	 * 
 	 * Only DHCP is supported at the moment.
 	 * 
-	 * It will initially choose any AP available in this network.
-	 * To change the AP use the connectToAccessPoint(BSSID) method.
+	 * It will initially choose any AP available in this network. To change the
+	 * AP use the connectToAccessPoint(BSSID) method.
 	 * 
 	 * @param ssid
 	 * @param wpa_psk
@@ -134,18 +134,22 @@ public class NetworkManager
 	}
 
 	/**
-	 * Associates this UE to a AP specified by the BSSID.
-	 * Assumes, that we are already connected to a Wi-Fi.
+	 * Associates this UE to a AP specified by the BSSID. Assumes, that we are
+	 * already connected to a Wi-Fi.
+	 * 
 	 * @param bssid
 	 */
 	public synchronized void associateToAccessPoint(String bssid)
 	{
 		Log.i(LTAG, "Connecting to AP with BSSID: " + bssid);
 		Shell.execute("wpa_cli -p/data/misc/wifi/sockets/ -iwlan0 disconnect");
-		Shell.execute("wpa_cli -p/data/misc/wifi/sockets/ -iwlan0 set_network 0 bssid " + bssid);
+		// only if there is a bssid (else connect to any)
+		if (bssid != null && bssid.length() > 0)
+			Shell.execute("wpa_cli -p/data/misc/wifi/sockets/ -iwlan0 set_network 0 bssid "
+					+ bssid);
 		Shell.execute("wpa_cli -p/data/misc/wifi/sockets/ -iwlan0 reassociate");
 	}
-	
+
 	/**
 	 * Disassociates this UE from a AP.
 	 */
@@ -297,7 +301,7 @@ public class NetworkManager
 
 				// change routing
 				RouteManager rm = RouteManager.getInstance();
-				
+
 				// set route to backend to always use dev rmnet0
 				String backend_ip = getBackendIp();
 				if (backend_ip != null)
@@ -312,13 +316,13 @@ public class NetworkManager
 					Log.e(LTAG,
 							"Can not resolve backen IP address. Route not set.");
 				}
-				
+
 				// set default route to use wlan0
 				rm.setDefaultRouteToWiFi();
-				
+
 				// check for active WiFi route
 				if (!rm.routeExists("default", null, WIFI_INTERFACE))
-					Log.e(LTAG, "ATTENTION: WiFi default route not found.");			
+					Log.e(LTAG, "ATTENTION: WiFi default route not found.");
 			}
 		}
 	};
