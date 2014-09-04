@@ -50,7 +50,7 @@ public class AssignmentThread implements Runnable
 			if(assignedApBackend == null || assignedApBackend.equals("none"))
 			{
 				// No AP assigned by backend: disconnect from Wi-Fi
-				
+				nm.disassociateFromAccessPoint();
 				// switch DNS
 				nm.setDnsServer("8.8.8.8", "8.8.4.4", NetworkManager.MOBILE_INTERFACE);
 			}
@@ -67,6 +67,7 @@ public class AssignmentThread implements Runnable
 								
 				// connect new assigned Wi-Fi
 				Log.i(LTAG, "Trying to connect to Wi-Fi: " + SSID + " using BSSID: " + BSSID);
+				nm.associateToAccessPoint(BSSID);
 				
 				// switch DNS
 				nm.setDnsServer("8.8.8.8", "8.8.4.4", NetworkManager.WIFI_INTERFACE);
