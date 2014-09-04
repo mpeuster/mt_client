@@ -8,7 +8,7 @@ import de.upb.upbmonitor.commandline.Shell;
 public class RouteManager
 {
 	private static final String LTAG = "RouteManager";
-	
+
 	private static RouteManager INSTANCE;
 
 	/**
@@ -37,13 +37,13 @@ public class RouteManager
 			Route r = Route.parse(l);
 			if (r != null)
 				result.add(r);
-		}	
+		}
 		return result;
 	}
-	
+
 	/**
-	 * Get first matching route.
-	 * Use "null" as wildcard.
+	 * Get first matching route. Use "null" as wildcard.
+	 * 
 	 * @param prefix
 	 * @param via
 	 * @param dev
@@ -51,25 +51,25 @@ public class RouteManager
 	 */
 	public synchronized Route getRoute(String prefix, String via, String dev)
 	{
-		for(Route r : this.getRouteList())
+		for (Route r : this.getRouteList())
 		{
 			boolean prefix_ok = true;
-			boolean via_ok  = true;
+			boolean via_ok = true;
 			boolean dev_ok = true;
-			
-			if(prefix != null)
-				if(!prefix.equals(r.getPrefix()))
-					prefix_ok=false;
-			
-			if(via != null)
-				if(!via.equals(r.getVia()))
-					via_ok=false;
-			
-			if(dev != null)
-				if(!dev.equals(r.getDev()))
-					dev_ok=false;
-			
-			if(prefix_ok && via_ok && dev_ok)
+
+			if (prefix != null)
+				if (!prefix.equals(r.getPrefix()))
+					prefix_ok = false;
+
+			if (via != null)
+				if (!via.equals(r.getVia()))
+					via_ok = false;
+
+			if (dev != null)
+				if (!dev.equals(r.getDev()))
+					dev_ok = false;
+
+			if (prefix_ok && via_ok && dev_ok)
 				return r;
 		}
 		return null;
@@ -84,22 +84,57 @@ public class RouteManager
 	{
 		Shell.execute("ip route del " + r.toString());
 	}
-	
-	public synchronized boolean routeExists(String prefix, String via, String dev)
+
+	public synchronized boolean routeExists(String prefix, String via,
+			String dev)
 	{
 		Route r = new Route(prefix, via, dev);
 		return routeExists(r);
 	}
-	
+
 	public synchronized boolean routeExists(Route r)
 	{
-		for(Route r2 : this.getRouteList())
+		for (Route r2 : this.getRouteList())
 		{
-			if(r2 != null)
+			if (r2 != null)
 				if (r2.equals(r))
-				return true;
+					return true;
 		}
 		return false;
+	}
+
+	public synchronized void setDefaultRouteToWiFi()
+	{
+		Log.i(LTAG, "Setting default route to: " + NetworkManager.WIFI_INTERFACE);
+		// remove existing default routes
+		this.removeDefaultRoutes();
+		// add new default route
+		Route r = new Route("default", NetworkManager.getInstance()
+				.getWifiGateway(), NetworkManager.WIFI_INTERFACE);
+		this.addRoute(r);
+	}
+
+	public synchronized void setDefaultRouteToMobile()
+	{
+		Log.i(LTAG, "Setting default route to: " + NetworkManager.MOBILE_INTERFACE);
+		// remove existing default routes
+		this.removeDefaultRoutes();
+		// add new default route
+		Route r = new Route("default", null, NetworkManager.MOBILE_INTERFACE);
+		this.addRoute(r);
+	}
+
+	private synchronized void removeDefaultRoutes()
+	{
+		Route r;
+		// remove default rmnet route (if present)
+		r = this.getRoute("default", null, NetworkManager.MOBILE_INTERFACE);
+		if (r != null)
+			this.removeRoute(r);
+		// remove default rmnet route (if present)
+		r = this.getRoute("default", null, NetworkManager.WIFI_INTERFACE);
+		if (r != null)
+			this.removeRoute(r);
 	}
 
 }

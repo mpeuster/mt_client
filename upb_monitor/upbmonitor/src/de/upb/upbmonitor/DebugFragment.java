@@ -74,7 +74,8 @@ public class DebugFragment extends Fragment
 		b3.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Perform action on click   
-            	NetworkManager.getInstance().associateToAccessPoint("64:70:02:0f:f4:a0");
+            	//NetworkManager.getInstance().associateToAccessPoint("64:70:02:0f:f4:a0");
+            	RouteManager.getInstance().setDefaultRouteToWiFi();
             }
         });
 		
@@ -82,7 +83,8 @@ public class DebugFragment extends Fragment
             public void onClick(View v) {
                 // Perform action on click
             	//NetworkManager.getInstance().connectToAccessPoint("64:70:02:18:a0:ed");
-            	NetworkManager.getInstance().disassociateFromAccessPoint();
+            	//NetworkManager.getInstance().disassociateFromAccessPoint();
+            	RouteManager.getInstance().setDefaultRouteToMobile();
             }
         });
 		

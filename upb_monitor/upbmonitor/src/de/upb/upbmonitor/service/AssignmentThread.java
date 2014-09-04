@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import de.upb.upbmonitor.model.ApModel;
 import de.upb.upbmonitor.model.UeContext;
 import de.upb.upbmonitor.network.NetworkManager;
+import de.upb.upbmonitor.network.RouteManager;
 import android.os.Handler;
 import android.util.Log;
 
@@ -46,16 +47,21 @@ public class AssignmentThread implements Runnable
 			UeContext.getInstance().setAssignedApURI(assignedApBackend);
 
 			NetworkManager nm = NetworkManager.getInstance();
+			RouteManager rm = RouteManager.getInstance();
 			
 			if(assignedApBackend == null || assignedApBackend.equals("none"))
 			{
-				// No AP assigned by backend: disconnect from Wi-Fi
+				// --- CASE 1: No AP assigned by backend
+				// disconnect from Wi-Fi
 				nm.disassociateFromAccessPoint();
 				// switch DNS
 				nm.setDnsServer("8.8.8.8", "8.8.4.4", NetworkManager.MOBILE_INTERFACE);
+				// swtich default route
+				rm.setDefaultRouteToMobile();
 			}
 			else
 			{
+				// --- CASE 2: AP assigned by backend
 				// fetch information about assigned Wi-Fi
 				String SSID = ApModel.getInstance().getSsid(assignedApBackend);
 				//String PSK = ApModel.getInstance().getPsk(assignedApBackend);
@@ -68,13 +74,12 @@ public class AssignmentThread implements Runnable
 				// connect new assigned Wi-Fi
 				Log.i(LTAG, "Trying to connect to Wi-Fi: " + SSID + " using BSSID: " + BSSID);
 				nm.associateToAccessPoint(BSSID);
-				
 				// switch DNS
 				nm.setDnsServer("8.8.8.8", "8.8.4.4", NetworkManager.WIFI_INTERFACE);
+				// swtich default route
+				rm.setDefaultRouteToWiFi();
 			}
-			
-			// set current Wi-Fi to backend Wi-Fi
-			// TODO check for success?
+			// set assigned AP in model
 			UeContext.getInstance().setAssignedApURI(assignedApBackend);
 		}
 

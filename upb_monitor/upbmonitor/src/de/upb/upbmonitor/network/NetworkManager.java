@@ -295,17 +295,10 @@ public class NetworkManager
 				// set DNS server
 				setDnsServer("8.8.8.8", "8.8.4.4", WIFI_INTERFACE);
 
-				// remove default rmnet route (if present)
+				// change routing
 				RouteManager rm = RouteManager.getInstance();
-				Route r = rm.getRoute("default", null, MOBILE_INTERFACE);
-				if (r != null)
-				{
-					Log.i(LTAG,
-							"Removing default route for mobile: "
-									+ r.toString());
-					rm.removeRoute(r);
-				}
-				// set route to backend on dev rmnet0
+				
+				// set route to backend to always use dev rmnet0
 				String backend_ip = getBackendIp();
 				if (backend_ip != null)
 				{
@@ -319,11 +312,13 @@ public class NetworkManager
 					Log.e(LTAG,
 							"Can not resolve backen IP address. Route not set.");
 				}
+				
+				// set default route to use wlan0
+				rm.setDefaultRouteToWiFi();
+				
 				// check for active WiFi route
 				if (!rm.routeExists("default", null, WIFI_INTERFACE))
-					Log.e(LTAG, "ATTENTION: WiFi default route not found.");
-				// OPTIONAL: Maybe create a new default WiFi route if not
-				// present
+					Log.e(LTAG, "ATTENTION: WiFi default route not found.");			
 			}
 		}
 	};
