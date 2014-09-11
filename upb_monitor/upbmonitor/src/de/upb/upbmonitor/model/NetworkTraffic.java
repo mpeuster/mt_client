@@ -10,7 +10,7 @@ public class NetworkTraffic
 
 	public enum TType
 	{
-		TotalRx, TotalRxBackup, TotalTx, TotalTxBackup, MobileRx, MobileRxBackup, MobileTx, MobileTxBackup, WifiRx, WifiTx
+		TotalRx, TotalRxBackup, TotalTx, TotalTxBackup, MobileRx, MobileRxBackup, MobileTx, MobileTxBackup, WifiRx, WifiTx, WifiRxBackup, WifiTxBackup
 	}
 
 	private static NetworkTraffic INSTANCE;
@@ -52,18 +52,19 @@ public class NetworkTraffic
 	{
 		this.setBytes(TType.MobileTx, b);
 	}
+	
+	public synchronized void setWifiRxBytes(long b)
+	{
+		this.setBytes(TType.WifiRx, b);
+	}
+
+	public synchronized void setWifiTxBytes(long b)
+	{
+		this.setBytes(TType.WifiTx, b);
+	}
 
 	private synchronized long getBytes(TType t)
 	{
-		// special case Wifi:
-		// calculate values, since they are not available in the API
-		// wifi = (total - mobile)
-		if (t == TType.WifiRx)
-			return this.mBytes.get(TType.TotalRx)
-					- this.mBytes.get(TType.MobileRx);
-		if (t == TType.WifiTx)
-			return this.mBytes.get(TType.TotalTx)
-					- this.mBytes.get(TType.MobileTx);
 		return this.mBytes.get(t);
 	}
 
@@ -99,14 +100,6 @@ public class NetworkTraffic
 
 	public synchronized float getBytesPerSecond(TType t)
 	{
-		// wifi special cases (calculated from mobile and total values)
-		if (t == TType.WifiRx)
-			return this.getBytesPerSecond(TType.TotalRx)
-					- this.getBytesPerSecond(TType.MobileRx);
-		if (t == TType.WifiTx)
-			return this.getBytesPerSecond(TType.TotalTx)
-					- this.getBytesPerSecond(TType.MobileTx);
-
 		TType tb = this.getBackupTType(t); // backup type
 		// calculate byte_count and time_interval since last update
 		float byte_count = this.mBytes.get(t) - this.mBytes.get(tb);
@@ -164,20 +157,28 @@ public class NetworkTraffic
 		this.mBytes.put(TType.TotalTx, 0L);
 		this.mBytes.put(TType.MobileRx, 0L);
 		this.mBytes.put(TType.MobileTx, 0L);
+		this.mBytes.put(TType.WifiRx, 0L);
+		this.mBytes.put(TType.WifiTx, 0L);
 		this.mBytes.put(TType.TotalRxBackup, 0L);
 		this.mBytes.put(TType.TotalTxBackup, 0L);
 		this.mBytes.put(TType.MobileRxBackup, 0L);
 		this.mBytes.put(TType.MobileTxBackup, 0L);
+		this.mBytes.put(TType.WifiRxBackup, 0L);
+		this.mBytes.put(TType.WifiTxBackup, 0L);
 
 		this.mTimestamp = new HashMap<TType, Long>();
 		this.mTimestamp.put(TType.TotalRx, System.currentTimeMillis());
 		this.mTimestamp.put(TType.TotalTx, System.currentTimeMillis());
 		this.mTimestamp.put(TType.MobileRx, System.currentTimeMillis());
 		this.mTimestamp.put(TType.MobileTx, System.currentTimeMillis());
+		this.mTimestamp.put(TType.WifiRx, System.currentTimeMillis());
+		this.mTimestamp.put(TType.WifiTx, System.currentTimeMillis());
 		this.mTimestamp.put(TType.TotalRxBackup, System.currentTimeMillis());
 		this.mTimestamp.put(TType.TotalTxBackup, System.currentTimeMillis());
 		this.mTimestamp.put(TType.MobileRxBackup, System.currentTimeMillis());
 		this.mTimestamp.put(TType.MobileTxBackup, System.currentTimeMillis());
+		this.mTimestamp.put(TType.WifiRxBackup, System.currentTimeMillis());
+		this.mTimestamp.put(TType.WifiTxBackup, System.currentTimeMillis());
 	}
 
 	public synchronized boolean hasChanged()
@@ -203,6 +204,10 @@ public class NetworkTraffic
 			return TType.MobileRxBackup;
 		case MobileTx:
 			return TType.MobileTxBackup;
+		case WifiRx:
+			return TType.WifiRxBackup;
+		case WifiTx:
+			return TType.WifiTxBackup;
 		default:
 			Log.e(LTAG, "Bad TType.");
 		}
