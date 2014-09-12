@@ -75,7 +75,14 @@ public class NetworkMonitor
 			return 0;
 		if (out.get(out.size() - 1).length() < 1)
 			return 0;
-		return Long.parseLong(out.get(out.size() - 1)); // always use last line
+		try
+		{
+			return Long.parseLong(out.get(out.size() - 1)); // always use last line
+		}
+		catch (Exception e)
+		{
+			return 0;
+		}		
 	}
 
 	private long getTxBytes(String iface)
@@ -89,7 +96,14 @@ public class NetworkMonitor
 			return 0;
 		if (out.get(out.size() - 1).length() < 1)
 			return 0;
-		return Long.parseLong(out.get(out.size() - 1)); // always use last line
+		try
+		{
+			return Long.parseLong(out.get(out.size() - 1)); // always use last line
+		}
+		catch (Exception e)
+		{
+			return 0;
+		}
 	}
 
 }
