@@ -340,8 +340,8 @@ public class ControlFragment extends Fragment
 				+ ("0.0.0.0/0".equals(wifi_ip) ? "" : " (" + ssid + ")"));
 
 		// tint image views
-		if (mobile_status && mobile_ip != null)
-			if (!mobile_ip.equals("0.0.0.0/0"))
+		if (mobile_status)
+			if (!"0.0.0.0/0".equals(mobile_ip))
 				this.imageMobileStatus.setColorFilter(Color.GREEN,
 						Mode.MULTIPLY); // ok
 			else
@@ -349,8 +349,8 @@ public class ControlFragment extends Fragment
 		else
 			this.imageMobileStatus.setColorFilter(Color.GRAY, Mode.MULTIPLY); // down
 
-		if (wifi_status && wifi_ip != null)
-			if (!wifi_ip.equals("0.0.0.0/0"))
+		if (wifi_status)
+			if (!"0.0.0.0/0".equals(wifi_ip))
 				this.imageWifiStatus.setColorFilter(Color.GREEN, Mode.MULTIPLY); // ok
 			else
 				this.imageWifiStatus.setColorFilter(Color.RED, Mode.MULTIPLY); // problem
