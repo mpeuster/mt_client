@@ -32,8 +32,7 @@ public class SenderThread implements Runnable
 
 		// initializations
 		// API end point
-		this.restUeEndpoint = new UeEndpoint(NetworkManager.getInstance()
-				.getIpByHostname(backendHost), backendPort);
+		this.restUeEndpoint = new UeEndpoint(backendHost, backendPort);
 
 		// kick off periodic run
 		this.getHandler().postDelayed(this, 0);

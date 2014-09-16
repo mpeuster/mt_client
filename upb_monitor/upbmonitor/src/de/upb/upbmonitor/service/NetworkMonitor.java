@@ -1,109 +1,156 @@
 package de.upb.upbmonitor.service;
 
-import java.util.ArrayList;
 
+import de.upb.upbmonitor.commandline.CmdCallback;
 import de.upb.upbmonitor.commandline.Shell;
 import de.upb.upbmonitor.model.NetworkTraffic;
 import de.upb.upbmonitor.network.NetworkManager;
-import android.content.Context;
-import android.net.TrafficStats;
+
+import android.util.Log;
 
 public class NetworkMonitor
 {
-	private static final String LTAG = "SystemMonitor";
-	private Context myContext;
+	private static final String LTAG = "NetworkMonitor";
+	private static int c = 0;
 
-	public NetworkMonitor(Context myContext)
+	public NetworkMonitor()
 	{
-		this.myContext = myContext;
 	}
 
 	public void monitor()
 	{
-		// measure values (use command line since SDK version produces wrong values)
-		long mobileRx = this.getMobileRxBytes();
-		long mobileTx = this.getMobileTxBytes();
-		long wifiRx = this.getWifiRxBytes();
-		long wifiTx = this.getWifiTxBytes();
-		
-		// update values in NetworkTraffic model
-		NetworkTraffic nt = NetworkTraffic.getInstance();
-		nt.setTotalRxBytes(mobileRx + wifiRx);
-		nt.setTotalTxBytes(mobileTx + wifiTx);
-		nt.setMobileRxBytes(mobileRx);
-		nt.setMobileTxBytes(mobileTx);
-		nt.setWifiRxBytes(wifiRx);
-		nt.setWifiTxBytes(wifiTx);
-		
-		/*
-		// old SDK version:
-		nt.setTotalRxBytes(TrafficStats.getTotalRxBytes());
-		nt.setTotalTxBytes(TrafficStats.getTotalTxBytes());
-		nt.setMobileRxBytes(TrafficStats.getMobileRxBytes());
-		nt.setMobileTxBytes(TrafficStats.getMobileTxBytes());
-		*/
-	}
-
-	private long getMobileRxBytes()
-	{
-		return getRxBytes(NetworkManager.MOBILE_INTERFACE);
-	}
-
-	private long getMobileTxBytes()
-	{
-		return getTxBytes(NetworkManager.MOBILE_INTERFACE);
-	}
-
-	private long getWifiRxBytes()
-	{
-		return getRxBytes(NetworkManager.WIFI_INTERFACE);
-	}
-
-	private long getWifiTxBytes()
-	{
-		return getTxBytes(NetworkManager.WIFI_INTERFACE);
-	}
-
-	private long getRxBytes(String iface)
-	{
-		ArrayList<String> out = Shell
-				.executeBlocking("busybox ifconfig "
-						+ iface
-						+ " | grep \"RX bytes\" | cut -d \" \" -f 12 | cut -d \":\" -f2");
-		// if output is not one line, something went wrong
-		if (out.size() < 1)
-			return 0;
-		if (out.get(out.size() - 1).length() < 1)
-			return 0;
-		try
+		if((c % 5) == 0)
 		{
-			return Long.parseLong(out.get(out.size() - 1)); // always use last line
+			Log.v(LTAG, "Measuring network data ...");
+			Shell.executeCustom(this.fetchMobileRxTraffic);
+			Shell.executeCustom(this.fetchMobileTxTraffic);
+			Shell.executeCustom(this.fetchWifiRxTraffic);
+			Shell.executeCustom(this.fetchWifiTxTraffic);
 		}
-		catch (Exception e)
-		{
-			return 0;
-		}		
+		c++;
 	}
 
-	private long getTxBytes(String iface)
+	private CmdCallback fetchMobileRxTraffic = new CmdCallback(
+			"cat /sys/class/net/" + NetworkManager.MOBILE_INTERFACE
+					+ "/statistics/rx_bytes")
 	{
-		ArrayList<String> out = Shell
-				.executeBlocking("busybox ifconfig "
-						+ iface
-						+ " | grep \"RX bytes\" | cut -d \" \" -f 17 | cut -d \":\" -f2");
-		// if output is not one line, something went wrong
-		if (out.size() < 1)
-			return 0;
-		if (out.get(out.size() - 1).length() < 1)
-			return 0;
-		try
+		@Override
+		public void commandCompleted(int id, int exitCode)
 		{
-			return Long.parseLong(out.get(out.size() - 1)); // always use last line
+			if (exitCode == 0)
+			{
+				long result = 0;
+				// parse result
+				if (getOutput().size() < 1)
+					result = 0;
+				if (getOutput().get(getOutput().size() - 1).length() < 1)
+					result = 0;
+				try
+				{
+					result = Long.parseLong(getOutput().get(
+							getOutput().size() - 1)); // always use last line
+				} catch (Exception e)
+				{
+					Log.w(LTAG, "Parsing error Rx.");
+					result = 0;
+				}
+				// store results in model
+				NetworkTraffic.getInstance().setMobileRxBytes(result);
+				Log.v(LTAG, "Stored Mobile RX: " + result);
+			}
 		}
-		catch (Exception e)
+	};
+	
+	private CmdCallback fetchMobileTxTraffic = new CmdCallback(
+			"cat /sys/class/net/" + NetworkManager.MOBILE_INTERFACE
+					+ "/statistics/tx_bytes")
+	{
+		@Override
+		public void commandCompleted(int id, int exitCode)
 		{
-			return 0;
+			if (exitCode == 0)
+			{
+				long result = 0;
+				// parse result
+				if (getOutput().size() < 1)
+					result = 0;
+				if (getOutput().get(getOutput().size() - 1).length() < 1)
+					result = 0;
+				try
+				{
+					result = Long.parseLong(getOutput().get(
+							getOutput().size() - 1)); // always use last line
+				} catch (Exception e)
+				{
+					Log.w(LTAG, "Parsing error TX.");
+					result = 0;
+				}
+				// store results in model
+				NetworkTraffic.getInstance().setMobileTxBytes(result);
+				Log.v(LTAG, "Stored Mobile TX: " + result);
+			}
 		}
-	}
-
+	};
+	
+	private CmdCallback fetchWifiRxTraffic = new CmdCallback(
+			"cat /sys/class/net/" + NetworkManager.WIFI_INTERFACE
+					+ "/statistics/rx_bytes")
+	{
+		@Override
+		public void commandCompleted(int id, int exitCode)
+		{
+			if (exitCode == 0)
+			{
+				long result = 0;
+				// parse result
+				if (getOutput().size() < 1)
+					result = 0;
+				if (getOutput().get(getOutput().size() - 1).length() < 1)
+					result = 0;
+				try
+				{
+					result = Long.parseLong(getOutput().get(
+							getOutput().size() - 1)); // always use last line
+				} catch (Exception e)
+				{
+					Log.w(LTAG, "Parsing error Rx.");
+					result = 0;
+				}
+				// store results in model
+				NetworkTraffic.getInstance().setWifiRxBytes(result);
+				Log.v(LTAG, "Stored Wifi RX: " + result);
+			}
+		}
+	};
+	
+	private CmdCallback fetchWifiTxTraffic = new CmdCallback(
+			"cat /sys/class/net/" + NetworkManager.WIFI_INTERFACE
+					+ "/statistics/tx_bytes")
+	{
+		@Override
+		public void commandCompleted(int id, int exitCode)
+		{
+			if (exitCode == 0)
+			{
+				long result = 0;
+				// parse result
+				if (getOutput().size() < 1)
+					result = 0;
+				if (getOutput().get(getOutput().size() - 1).length() < 1)
+					result = 0;
+				try
+				{
+					result = Long.parseLong(getOutput().get(
+							getOutput().size() - 1)); // always use last line
+				} catch (Exception e)
+				{
+					Log.w(LTAG, "Parsing error Tx.");
+					result = 0;
+				}
+				// store results in model
+				NetworkTraffic.getInstance().setWifiTxBytes(result);
+				Log.v(LTAG, "Stored Wifi TX:" + result);
+			}
+		}
+	};
 }

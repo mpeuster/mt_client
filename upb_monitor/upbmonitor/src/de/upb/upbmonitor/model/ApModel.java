@@ -63,13 +63,16 @@ public class ApModel
 	 */
 	public synchronized String getSsid(String url)
 	{
-		try
+		if(url != null && this.mApList.containsKey(url))
 		{
-			return this.mApList.get(url).getString("ssid");
-		} catch (Exception e)
-		{
-			Log.e(LTAG, "Could not get AP value from model.");
-			e.printStackTrace();
+			try
+			{
+				return this.mApList.get(url).getString("ssid");
+			} catch (Exception e)
+			{
+				Log.e(LTAG, "Could not get AP value from model. Url: " + url);
+				e.printStackTrace();
+			}
 		}
 		return null;
 	}
@@ -81,13 +84,16 @@ public class ApModel
 	 */
 	public synchronized String getBssid(String url)
 	{
-		try
+		if(url != null && this.mApList.containsKey(url))
 		{
-			return this.mApList.get(url).getString("bssid");
-		} catch (Exception e)
-		{
-			Log.e(LTAG, "Could not get AP value from model.");
-			e.printStackTrace();
+			try
+			{
+				return this.mApList.get(url).getString("bssid");
+			} catch (Exception e)
+			{
+				Log.e(LTAG, "Could not get AP value from model. Url:" + url);
+				e.printStackTrace();
+			}
 		}
 		return null;
 	}

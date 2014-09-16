@@ -48,16 +48,20 @@ public class ManagementService extends Service
 		super.onDestroy();
 		Log.d(LTAG, "onDestroy()");
 
-		monitorTask.getHandler().removeCallbacks(monitorTask);
+		if(monitorTask.getHandler() != null)
+			monitorTask.getHandler().removeCallbacks(monitorTask);
 		monitorThread.quit();
 
-		senderTask.getHandler().removeCallbacks(senderTask);
+		if(senderTask.getHandler() != null)
+			senderTask.getHandler().removeCallbacks(senderTask);
 		senderThread.quit();
 		
-		receiverTask.getHandler().removeCallbacks(receiverTask);
+		if(receiverTask.getHandler() != null)
+			receiverTask.getHandler().removeCallbacks(receiverTask);
 		receiverThread.quit();
 		
-		assignmentTask.getHandler().removeCallbacks(receiverTask);
+		if(assignmentTask.getHandler() != null)
+			assignmentTask.getHandler().removeCallbacks(receiverTask);
 		assignmentThread.quit();
 
 		senderTask.removeUe(); // attention not async!
@@ -83,8 +87,13 @@ public class ManagementService extends Service
 			// backend API destination preferences
 			BACKEND_HOST = preferences.getString("pref_backend_api_address",
 					null);
+			// nslookup
+			if(BACKEND_HOST != null)
+			{
+				BACKEND_HOST = NetworkManager.getInstance().getIpByHostname(BACKEND_HOST);
+			}
 			BACKEND_PORT = Integer.valueOf(preferences.getString(
-					"pref_backend_api_port", "5000"));
+					"pref_backend_api_port", "6680"));
 		} catch (Exception e)
 		{
 			// if preferences could not be read, use a fixed interval

@@ -108,7 +108,14 @@ public class NetworkTraffic
 		if (time_interval < 50) // avoid to small measurements (< 50ms)
 			return 0.0F;
 		// TODO Next: Make calculation interval dependent on last get()
-		return byte_count / (time_interval / 1000); // = byte/s
+		float bps = byte_count / (time_interval / 1000); // = byte/s
+		
+		// check result
+		if(bps < 0)
+			bps = 0.0F;
+		if(bps > 10000000)
+			bps = 10000000;		
+		return bps;
 	}
 	
 	public synchronized float getTotalRxBytesPerSecond()

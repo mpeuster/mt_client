@@ -44,42 +44,53 @@ public class AssignmentThread implements Runnable
 		{
 			Log.i(LTAG, "Connection change needed!" + " Backend: "
 					+ assignedApBackend + " / Current: " + assignedApCurrent);
-			UeContext.getInstance().setAssignedApURI(assignedApBackend);
 
 			NetworkManager nm = NetworkManager.getInstance();
 			RouteManager rm = RouteManager.getInstance();
-			
-			if(nm.isDualNetworkingEnabled()) // only change connection when DN is on!
+
+			if (nm.isDualNetworkingEnabled()) // only change connection when DN
+												// is on!
 			{
-				if(assignedApBackend == null || assignedApBackend.equals("none"))
+				if (assignedApBackend == null
+						|| assignedApBackend.equals("none"))
 				{
 					// --- CASE 1: No AP assigned by backend
 					// disconnect from Wi-Fi
 					nm.disassociateFromAccessPoint();
 					// switch DNS
-					nm.setDnsServer("8.8.8.8", "8.8.4.4", NetworkManager.MOBILE_INTERFACE);
+					nm.setDnsServer("8.8.8.8", "8.8.4.4",
+							NetworkManager.MOBILE_INTERFACE);
 					// swtich default route
 					rm.setDefaultRouteToMobile();
-				}
-				else
+				} else
 				{
 					// --- CASE 2: AP assigned by backend
 					// fetch information about assigned Wi-Fi
-					String SSID = ApModel.getInstance().getSsid(assignedApBackend);
-					//String PSK = ApModel.getInstance().getPsk(assignedApBackend);
-					String BSSID = ApModel.getInstance().getBssid(assignedApBackend);
-					if(SSID == null)
-						Log.e(LTAG, "AP without SSID assigned!");
-					if(BSSID == null)
-						Log.e(LTAG, "AP without BSSID assigned!");
-					else				
-					// connect new assigned Wi-Fi
-					Log.i(LTAG, "Trying to connect to Wi-Fi: " + SSID + " using BSSID: " + BSSID);
-					nm.associateToAccessPoint(BSSID);
-					// switch DNS
-					nm.setDnsServer("8.8.8.8", "8.8.4.4", NetworkManager.WIFI_INTERFACE);
-					// swtich default route
-					rm.setDefaultRouteToWiFi();
+					String SSID = ApModel.getInstance().getSsid(
+							assignedApBackend);
+					// String PSK =
+					// ApModel.getInstance().getPsk(assignedApBackend);
+					String BSSID = ApModel.getInstance().getBssid(
+							assignedApBackend);
+
+					if (SSID == null)
+					{
+						Log.w(LTAG, "AP without SSID assigned!");
+					} else if (BSSID == null)
+					{
+						Log.w(LTAG, "AP without BSSID assigned!");
+					} else
+					{
+						// connect new assigned Wi-Fi
+						Log.i(LTAG, "Trying to connect to Wi-Fi: " + SSID
+								+ " using BSSID: " + BSSID);
+						nm.associateToAccessPoint(BSSID);
+						// switch DNS
+						nm.setDnsServer("8.8.8.8", "8.8.4.4",
+								NetworkManager.WIFI_INTERFACE);
+						// swtich default route
+						rm.setDefaultRouteToWiFi();
+					}
 				}
 			}
 			// set assigned AP in model
@@ -104,7 +115,8 @@ public class AssignmentThread implements Runnable
 			return null;
 		try
 		{
-			String backend_ap_uri = backend_data.getString("assigned_accesspoint");
+			String backend_ap_uri = backend_data
+					.getString("assigned_accesspoint");
 			// no ap assigned
 			if (backend_ap_uri == null)
 				return "none";
@@ -125,7 +137,7 @@ public class AssignmentThread implements Runnable
 		// null case
 		if (ap_backend == null || ap_current == null)
 			return false;
-		
+
 		// string case
 		return !ap_backend.equals(ap_current);
 	}

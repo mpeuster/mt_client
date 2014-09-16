@@ -19,19 +19,18 @@ import com.stericson.RootTools.execution.CommandCapture;
 public class Shell
 {
 	private static final String LTAG = "Shell";
-	private static ArrayList<String> output;
 	
-	public static void execute(String... command)
+	public synchronized static void execute(String... command)
 	{
 		execute(true, false, null, command);
 	}
 	
-	public static ArrayList<String> executeBlocking(String... command)
+	public synchronized static ArrayList<String> executeBlocking(String... command)
 	{
 		return execute(true, true, null, command);
 	}
 	
-	public static void executeCustom(CmdCallback cmd)
+	public synchronized static void executeCustom(CmdCallback cmd)
 	{
 		execute(true, true, cmd, "");
 	}
@@ -44,24 +43,15 @@ public class Shell
 	 * @param command
 	 * @return ArrayList<String>
 	 */
-	private static ArrayList<String> execute(boolean asRoot, final boolean asBlocking, CmdCallback custom_cmd, String... command)
+	private synchronized static ArrayList<String> execute(boolean asRoot, final boolean asBlocking, CmdCallback custom_cmd, String... command)
 	{
-		// create output array
-		output = new ArrayList<String>();
-		
 		// define command
-		Command cmd;
+		CmdCallback cmd;
 		
 		if(custom_cmd == null)
 		{
 			cmd = new CmdCallback(0, false, command)
 			{
-				@Override
-				public void commandOutput(int id, String line)
-				{
-					if(asBlocking)
-						output.add(line);
-				}
 			};
 		}
 		else
@@ -96,6 +86,6 @@ public class Shell
 			e.printStackTrace();
 		}
 		// return output lines of command
-		return output;
+		return cmd.getOutput();
 	}
 }

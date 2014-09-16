@@ -198,16 +198,21 @@ public class NetworkManager
 	public synchronized String getCurrentSsid()
 	{
 		// look into wpa_supplicatn.conf to get ssid
+		// ArrayList<String> out = Shell
+		// .executeBlocking("cat /data/misc/wifi/wpa_supplicant.conf | grep \"ssid=\" | cut -d '\"' -f2");
 		ArrayList<String> out = Shell
-				.executeBlocking("cat /data/misc/wifi/wpa_supplicant.conf | grep \"ssid=\" | cut -d '\"' -f2");
+				.executeBlocking("wpa_cli -p/data/misc/wifi/sockets/ -iwlan0 status | grep 'ssid' | cut -d '=' -f2");
 		// if output is not one line, something went wrong
 		if (out.size() < 1)
 		{
-			Log.e(LTAG, "Error reading: /data/misc/wifi/wpa_supplicant.conf");
+			//Log.e(LTAG, "Error while fetching SSID.");
 			return null;
 		}
 		// get SSID (always use last output)
 		String ssid = out.get(out.size() - 1);
+		
+		if(ssid.contains("error"))
+			return null;
 
 		Log.v(LTAG, "Current SSID: " + ssid);
 
@@ -223,8 +228,8 @@ public class NetworkManager
 	{
 		// not sure why, but this is not always the same, so try both:
 		String alt1 = this.getProp("dhcp." + WIFI_INTERFACE + ".gateway");
-		String alt2 = this.getProp("net." + WIFI_INTERFACE + ".gw"); 
-		if(alt1 != null)
+		String alt2 = this.getProp("net." + WIFI_INTERFACE + ".gw");
+		if (alt1 != null)
 			return alt1;
 		return alt2;
 	}
@@ -233,8 +238,8 @@ public class NetworkManager
 	{
 		// not sure why, but this is not always the same, so try both:
 		String alt1 = this.getProp("dhcp." + MOBILE_INTERFACE + ".gateway");
-		String alt2 = this.getProp("net." + MOBILE_INTERFACE + ".gw"); 
-		if(alt1 != null)
+		String alt2 = this.getProp("net." + MOBILE_INTERFACE + ".gw");
+		if (alt1 != null)
 			return alt1;
 		return alt2;
 	}
@@ -315,8 +320,8 @@ public class NetworkManager
 				// set default route to use wlan0 (only remove the default to
 				rm.setDefaultRouteToWiFi();
 				// rmnet0)
-				//rm.removeRoute(rm.getRoute("default", null,
-				//		NetworkManager.MOBILE_INTERFACE));
+				// rm.removeRoute(rm.getRoute("default", null,
+				// NetworkManager.MOBILE_INTERFACE));
 
 				// set route to backend to always use dev rmnet0
 				String backend_ip = getBackendIp();
@@ -418,7 +423,7 @@ public class NetworkManager
 		// if output is not one line, something went wrong
 		if (out.size() < 1)
 		{
-			Log.e(LTAG, "Bad netcfg result.");
+			//Log.e(LTAG, "Bad netcfg result: " + out);
 			return null;
 		}
 		// parse output and put all interesting values into array
@@ -511,7 +516,9 @@ public class NetworkManager
 			return null;
 		if (out.get(out.size() - 1).length() < 1)
 			return null;
-		return out.get(out.size() - 1); // always use last line
+		String res =  out.get(out.size() - 1); // always use last line
+		Log.i(LTAG,"Lookup: " + hostname + " = " + res);
+		return res;
 
 	}
 
