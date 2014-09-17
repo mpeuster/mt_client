@@ -2,6 +2,8 @@ package de.upb.upbmonitor.model;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import android.os.SystemClock;
 import android.util.Log;
 
 public class NetworkTraffic
@@ -29,7 +31,7 @@ public class NetworkTraffic
 			this.mBytes.put(tb, this.mBytes.get(t));
 			this.mTimestamp.put(tb, this.mTimestamp.get(t));
 			this.mBytes.put(t, b);
-			this.mTimestamp.put(t, System.currentTimeMillis());
+			this.mTimestamp.put(t, SystemClock.elapsedRealtime());
 		}
 	}
 

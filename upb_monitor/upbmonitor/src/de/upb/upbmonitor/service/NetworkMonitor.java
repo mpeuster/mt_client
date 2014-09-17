@@ -22,11 +22,19 @@ public class NetworkMonitor
 
 	public void monitor()
 	{
+		long m_rx = getByteCount(NetworkManager.MOBILE_INTERFACE, "rx");
+		long m_tx = getByteCount(NetworkManager.MOBILE_INTERFACE, "tx");
+		long w_rx = getByteCount(NetworkManager.WIFI_INTERFACE, "rx");
+		long w_tx = getByteCount(NetworkManager.WIFI_INTERFACE, "tx");
+		
 		NetworkTraffic nt = NetworkTraffic.getInstance();
-		nt.setMobileRxBytes(getByteCount(NetworkManager.MOBILE_INTERFACE, "rx"));
-		nt.setMobileTxBytes(getByteCount(NetworkManager.MOBILE_INTERFACE, "tx"));
-		nt.setWifiRxBytes(getByteCount(NetworkManager.WIFI_INTERFACE, "rx"));
-		nt.setWifiTxBytes(getByteCount(NetworkManager.WIFI_INTERFACE, "tx"));
+		nt.setMobileRxBytes(m_rx);
+		nt.setMobileTxBytes(m_tx);
+		nt.setWifiRxBytes(w_rx);
+		nt.setWifiTxBytes(w_tx);
+		nt.setTotalRxBytes(m_rx + w_rx);
+		nt.setTotalTxBytes(m_tx + w_tx);
+
 		/*
 		 * Log.i(LTAG,"Mobile RX: " + nt.getMobileRxBytes());
 		 * Log.i(LTAG,"Mobile TX: " + nt.getMobileTxBytes());
