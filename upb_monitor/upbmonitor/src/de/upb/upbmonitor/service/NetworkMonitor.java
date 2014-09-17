@@ -1,17 +1,20 @@
 package de.upb.upbmonitor.service;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 import de.upb.upbmonitor.commandline.CmdCallback;
 import de.upb.upbmonitor.commandline.Shell;
 import de.upb.upbmonitor.model.NetworkTraffic;
+import de.upb.upbmonitor.model.UeContext;
 import de.upb.upbmonitor.network.NetworkManager;
-
 import android.util.Log;
 
 public class NetworkMonitor
 {
 	private static final String LTAG = "NetworkMonitor";
-	private static int c = 0;
 
 	public NetworkMonitor()
 	{
@@ -19,138 +22,57 @@ public class NetworkMonitor
 
 	public void monitor()
 	{
-		if((c % 5) == 0)
-		{
-			Log.v(LTAG, "Measuring network data ...");
-			Shell.executeCustom(this.fetchMobileRxTraffic);
-			Shell.executeCustom(this.fetchMobileTxTraffic);
-			Shell.executeCustom(this.fetchWifiRxTraffic);
-			Shell.executeCustom(this.fetchWifiTxTraffic);
-		}
-		c++;
+		NetworkTraffic nt = NetworkTraffic.getInstance();
+		nt.setMobileRxBytes(getByteCount(NetworkManager.MOBILE_INTERFACE, "rx"));
+		nt.setMobileTxBytes(getByteCount(NetworkManager.MOBILE_INTERFACE, "tx"));
+		nt.setWifiRxBytes(getByteCount(NetworkManager.WIFI_INTERFACE, "rx"));
+		nt.setWifiTxBytes(getByteCount(NetworkManager.WIFI_INTERFACE, "tx"));
+		/*
+		 * Log.i(LTAG,"Mobile RX: " + nt.getMobileRxBytes());
+		 * Log.i(LTAG,"Mobile TX: " + nt.getMobileTxBytes());
+		 * Log.i(LTAG,"Wifi RX: " + nt.getWifiRxBytes()); Log.i(LTAG,"Wifi TX: "
+		 * + nt.getWifiTxBytes());
+		 */
 	}
 
-	private CmdCallback fetchMobileRxTraffic = new CmdCallback(
-			"cat /sys/class/net/" + NetworkManager.MOBILE_INTERFACE
-					+ "/statistics/rx_bytes")
+	private long getByteCount(String iface, String direction)
 	{
-		@Override
-		public void commandCompleted(int id, int exitCode)
+		String path = "/sys/class/net/" + iface + "/statistics/" + direction
+				+ "_bytes";
+		long result = 0;
+
+		try
 		{
-			if (exitCode == 0)
-			{
-				long result = 0;
-				// parse result
-				if (getOutput().size() < 1)
-					result = 0;
-				if (getOutput().get(getOutput().size() - 1).length() < 1)
-					result = 0;
-				try
-				{
-					result = Long.parseLong(getOutput().get(
-							getOutput().size() - 1)); // always use last line
-				} catch (Exception e)
-				{
-					Log.w(LTAG, "Parsing error Rx.");
-					result = 0;
-				}
-				// store results in model
-				NetworkTraffic.getInstance().setMobileRxBytes(result);
-				Log.v(LTAG, "Stored Mobile RX: " + result);
-			}
+			result = Long.parseLong(this.getSysfilecontent(path));
+		} catch (Exception e)
+		{
+			// e.printStackTrace();
+			Log.w(LTAG, "Parsing error: " + this.getSysfilecontent(path));
+			result = 0;
 		}
-	};
-	
-	private CmdCallback fetchMobileTxTraffic = new CmdCallback(
-			"cat /sys/class/net/" + NetworkManager.MOBILE_INTERFACE
-					+ "/statistics/tx_bytes")
+		return result;
+	}
+
+	private String getSysfilecontent(String path)
 	{
-		@Override
-		public void commandCompleted(int id, int exitCode)
+		String result = "";
+		try
 		{
-			if (exitCode == 0)
+			File file = new File(path);
+			InputStream in = new FileInputStream(file);
+			byte[] re = new byte[32768];
+			int read = 0;
+			while ((read = in.read(re, 0, 32768)) != -1)
 			{
-				long result = 0;
-				// parse result
-				if (getOutput().size() < 1)
-					result = 0;
-				if (getOutput().get(getOutput().size() - 1).length() < 1)
-					result = 0;
-				try
-				{
-					result = Long.parseLong(getOutput().get(
-							getOutput().size() - 1)); // always use last line
-				} catch (Exception e)
-				{
-					Log.w(LTAG, "Parsing error TX.");
-					result = 0;
-				}
-				// store results in model
-				NetworkTraffic.getInstance().setMobileTxBytes(result);
-				Log.v(LTAG, "Stored Mobile TX: " + result);
+				result += new String(re, 0, read);
 			}
-		}
-	};
-	
-	private CmdCallback fetchWifiRxTraffic = new CmdCallback(
-			"cat /sys/class/net/" + NetworkManager.WIFI_INTERFACE
-					+ "/statistics/rx_bytes")
-	{
-		@Override
-		public void commandCompleted(int id, int exitCode)
+			in.close();
+		} catch (IOException e)
 		{
-			if (exitCode == 0)
-			{
-				long result = 0;
-				// parse result
-				if (getOutput().size() < 1)
-					result = 0;
-				if (getOutput().get(getOutput().size() - 1).length() < 1)
-					result = 0;
-				try
-				{
-					result = Long.parseLong(getOutput().get(
-							getOutput().size() - 1)); // always use last line
-				} catch (Exception e)
-				{
-					Log.w(LTAG, "Parsing error Rx.");
-					result = 0;
-				}
-				// store results in model
-				NetworkTraffic.getInstance().setWifiRxBytes(result);
-				Log.v(LTAG, "Stored Wifi RX: " + result);
-			}
+			// e.printStackTrace();
+			Log.e(LTAG, "Error while reading file: " + path);
 		}
-	};
-	
-	private CmdCallback fetchWifiTxTraffic = new CmdCallback(
-			"cat /sys/class/net/" + NetworkManager.WIFI_INTERFACE
-					+ "/statistics/tx_bytes")
-	{
-		@Override
-		public void commandCompleted(int id, int exitCode)
-		{
-			if (exitCode == 0)
-			{
-				long result = 0;
-				// parse result
-				if (getOutput().size() < 1)
-					result = 0;
-				if (getOutput().get(getOutput().size() - 1).length() < 1)
-					result = 0;
-				try
-				{
-					result = Long.parseLong(getOutput().get(
-							getOutput().size() - 1)); // always use last line
-				} catch (Exception e)
-				{
-					Log.w(LTAG, "Parsing error Tx.");
-					result = 0;
-				}
-				// store results in model
-				NetworkTraffic.getInstance().setWifiTxBytes(result);
-				Log.v(LTAG, "Stored Wifi TX:" + result);
-			}
-		}
-	};
+		return result.trim();
+	}
+
 }

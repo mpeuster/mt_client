@@ -2,6 +2,7 @@ package de.upb.upbmonitor.service;
 
 import android.content.Context;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
 import de.upb.upbmonitor.model.UeContext;
 
@@ -47,12 +48,13 @@ public class MonitoringThread implements Runnable
 
 	private void monitor()
 	{
+		Log.d(LTAG, "Monitoring @ " + SystemClock.elapsedRealtime());
 		// call monitoring components
 		this.mSystemMonitor.monitor();
 		this.mNetworkMonitor.monitor();
 		// update model
 		UeContext c = UeContext.getInstance();
-		c.incrementUpdateCount();
+		c.incrementUpdateCount();	
 	}
 
 	public synchronized Handler getHandler()
