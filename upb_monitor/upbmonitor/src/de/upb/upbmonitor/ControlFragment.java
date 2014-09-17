@@ -230,7 +230,7 @@ public class ControlFragment extends Fragment
 			return;
 
 		Toast.makeText(getActivity(), "Eanbleing dual network connectivity.",
-				Toast.LENGTH_LONG).show();
+				Toast.LENGTH_SHORT).show();
 
 		// disable switch
 		this.switchDualNetworking.setEnabled(false);
@@ -269,7 +269,7 @@ public class ControlFragment extends Fragment
 			return;
 
 		Toast.makeText(getActivity(), "Disableing dual network connectivity.",
-				Toast.LENGTH_LONG).show();
+				Toast.LENGTH_SHORT).show();
 
 		// disable switch
 		this.switchDualNetworking.setEnabled(false);
@@ -295,7 +295,7 @@ public class ControlFragment extends Fragment
 			return true;
 		}
 		Toast.makeText(getActivity(),
-				"ERROR: Root access not possible on device!", Toast.LENGTH_LONG)
+				"ERROR: Root access not possible on device!", Toast.LENGTH_SHORT)
 				.show();
 		Log.e(LTAG, "Root access not possible");
 		return false;
@@ -315,7 +315,7 @@ public class ControlFragment extends Fragment
 		}
 
 		Toast.makeText(getActivity(),
-				"ERROR: Busybox is not installed on device!", Toast.LENGTH_LONG)
+				"ERROR: Busybox is not installed on device!", Toast.LENGTH_SHORT)
 				.show();
 		Log.e(LTAG, "Busybox is NOT available");
 		return false;

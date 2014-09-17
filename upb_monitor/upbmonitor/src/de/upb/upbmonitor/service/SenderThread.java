@@ -21,7 +21,7 @@ public class SenderThread implements Runnable
 	private Handler myHandler;
 	private int mInterval;
 	private UeEndpoint restUeEndpoint = null;
-	private boolean shuldBeConnected = false;
+	private int mRegisterTries = 0;
 
 	public SenderThread(Handler myHandler, int interval, String backendHost,
 			int backendPort)
@@ -46,20 +46,15 @@ public class SenderThread implements Runnable
 
 		if (c.getURI() == null)
 		{
-			if (!this.shuldBeConnected)
+			// register UE in backend
+			this.restUeEndpoint.register();
+			// show toast message every n-th retry
+			if ((this.mRegisterTries - 1) % 5 == 0)
 			{
-				// register UE in backend
-				this.restUeEndpoint.register();
-				this.shuldBeConnected = true;
-			} else
-			{
-				// something went wrong with the register operation in the last
-				// try
 				Toast.makeText(UeContext.getInstance().getApplicationContext(),
 						"Backend connection error.", Toast.LENGTH_SHORT).show();
-				// trigger re-register
-				this.shuldBeConnected = false;
 			}
+			this.mRegisterTries++;
 		} else
 		{
 			// periodically send update if UE is registered
