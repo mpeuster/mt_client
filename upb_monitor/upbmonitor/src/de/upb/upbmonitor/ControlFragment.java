@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.stericson.RootTools.RootTools;
 
+import de.upb.upbmonitor.commandline.Shell;
 import de.upb.upbmonitor.model.UeContext;
 import de.upb.upbmonitor.network.NetworkManager;
 import de.upb.upbmonitor.service.ManagementService;
@@ -19,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -38,12 +40,17 @@ public class ControlFragment extends Fragment
 	private Switch switchDualNetworking;
 	private TextView textMobileStatus;
 	private TextView textWifiStatus;
+	private TextView textMPTCPStatus;
+	private CheckBox checkMPTCPEnabled;
 	private ImageView imageMobileStatus;
 	private ImageView imageWifiStatus;
 
+	private boolean mMptcpEnabled;
+
 	private Handler mHandler = new Handler();
-	// enable only after dual network switch even, initial: bigger than max_retry!
-	private int updateTries = MAX_RETRY_BEFORE_SWITCH_RESET + 1; 
+	// enable only after dual network switch even, initial: bigger than
+	// max_retry!
+	private int updateTries = MAX_RETRY_BEFORE_SWITCH_RESET + 1;
 	private static final int MAX_RETRY_BEFORE_SWITCH_RESET = 10;
 
 	/**
@@ -132,6 +139,13 @@ public class ControlFragment extends Fragment
 				.findViewById(R.id.textViewMobileStatus);
 		this.textWifiStatus = (TextView) rootView
 				.findViewById(R.id.textViewWifiStatus);
+		this.textMPTCPStatus = (TextView) rootView
+				.findViewById(R.id.textViewMPTCP);
+		this.checkMPTCPEnabled = (CheckBox) rootView
+				.findViewById(R.id.checkBoxMPTCP);
+
+		// check MPTCP availability
+		this.mMptcpEnabled = this.checkMptcpEnabled();
 
 		// set switch state based on service state (if app is restarted)
 		this.switchMonitoringService
@@ -166,10 +180,37 @@ public class ControlFragment extends Fragment
 					public void onCheckedChanged(CompoundButton buttonView,
 							boolean isChecked)
 					{
+						// update MPTCP CheckBox
+						checkMPTCPEnabled.setEnabled(mMptcpEnabled
+								&& !isChecked);
+						textMPTCPStatus.setEnabled(mMptcpEnabled && !isChecked);
+						// perform network change
 						if (isChecked)
 							startDualNetworking();
 						else
 							stopDualNetworking();
+					}
+				});
+
+		// update and set MPTCP checkbox
+		this.textMPTCPStatus
+				.setText(this.mMptcpEnabled ? "(MPTCP: installed)"
+						: "(MPTCP: not installed)");
+		// update MPTCP CheckBox
+		checkMPTCPEnabled.setEnabled(mMptcpEnabled
+				&& !switchDualNetworking.isChecked());
+		textMPTCPStatus.setEnabled(mMptcpEnabled
+				&& !switchDualNetworking.isChecked());
+
+		// MPTCP CheckBox listener
+		this.checkMPTCPEnabled
+				.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+				{
+					@Override
+					public void onCheckedChanged(CompoundButton buttonView,
+							boolean isChecked)
+					{
+						Log.w(LTAG, "MPTCP ChackBox: " + isChecked);
 					}
 				});
 
@@ -295,8 +336,8 @@ public class ControlFragment extends Fragment
 			return true;
 		}
 		Toast.makeText(getActivity(),
-				"ERROR: Root access not possible on device!", Toast.LENGTH_SHORT)
-				.show();
+				"ERROR: Root access not possible on device!",
+				Toast.LENGTH_SHORT).show();
 		Log.e(LTAG, "Root access not possible");
 		return false;
 	}
@@ -315,9 +356,24 @@ public class ControlFragment extends Fragment
 		}
 
 		Toast.makeText(getActivity(),
-				"ERROR: Busybox is not installed on device!", Toast.LENGTH_SHORT)
-				.show();
+				"ERROR: Busybox is not installed on device!",
+				Toast.LENGTH_SHORT).show();
 		Log.e(LTAG, "Busybox is NOT available");
+		return false;
+	}
+
+	private boolean checkMptcpEnabled()
+	{
+		ArrayList<String> out = Shell
+				.executeBlocking("sysctl -a | grep mptcp_enabled");
+		// if output is not one line, something went wrong
+		if (out.size() < 1)
+			return false;
+		if (out.get(out.size() - 1).length() < 1)
+			return false;
+		String res = out.get(out.size() - 1); // always use last line
+		if ("net.mptcp.mptcp_enabled = 1".equals(res))
+			return true;
 		return false;
 	}
 

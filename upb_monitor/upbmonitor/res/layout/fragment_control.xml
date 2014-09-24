@@ -38,7 +38,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="8dp"
-                android:text="The management service runs in background and measures UE activity. It automatically sends these information to the testbed backend. If the backend assigns the UE to a new Wi-Fi AP, the service will trigger the re-connection process."
+                android:text="The management service runs in background and measures UE activity. It automatically sends the status of the UE to the backend. If the backend assigns this UE to a new Wi-Fi AP, the service will trigger the re-connection process."
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
         </LinearLayout>
@@ -60,8 +60,29 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="8dp"
-                android:text="Enable or disable the dual connectivity mode. If enabled 3G and Wi-Fi interfaces are active simultaneously. This action needs root access. Attention: Wi-Fi status is not shown in status bar of the device."
+                android:text="Enable or disable the dual connectivity mode. If enabled, 3G and Wi-Fi interfaces are active simultaneously. This action needs root access. Attention: Wi-Fi status is not shown in status bar of the device. Optional MPTCP: Configure routing for automatic MPTCP usage."
                 android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <CheckBox
+                    android:id="@+id/checkBoxMPTCP"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Use MPTCP" />
+
+                <TextView
+                    android:id="@+id/textViewMPTCP"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+					android:textAlignment="gravity"
+                    android:text="(not installed)"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -107,6 +128,8 @@
                     android:src="@drawable/ic_wifi_state" />
 
             </LinearLayout>
+            
+
 
 
         </LinearLayout>
