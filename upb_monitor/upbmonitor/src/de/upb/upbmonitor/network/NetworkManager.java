@@ -211,7 +211,7 @@ public class NetworkManager
 		// get SSID (always use last output)
 		String ssid = out.get(out.size() - 1);
 		
-		if(ssid.contains("error"))
+		if(ssid.contains("error") || ssid.contains("Failed"))
 			return null;
 
 		Log.v(LTAG, "Current SSID: " + ssid);
