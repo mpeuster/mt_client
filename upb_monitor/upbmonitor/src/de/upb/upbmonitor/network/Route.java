@@ -71,11 +71,11 @@ public class Route
 		String table = null;
 
 		// at least prefix + via or dev
-		String[] parts = input.split(" ");
+		String[] parts = input.split("\\s+");
 		if (parts.length < 3)
 			return null;
 
-		// parse for via or dev
+		// parse for options
 		prefix = parts[0];
 		via = getRouteValueByKey(parts, "via");
 		dev = getRouteValueByKey(parts, "dev");
@@ -88,7 +88,7 @@ public class Route
 	
 	private static String getRouteValueByKey(String[] parts,String k)
 	{
-		for(int i = 1; i < parts.length - 1; i++)
+		for(int i = 0; i < parts.length - 1; i++)
 		{
 			if (k.equals(parts[i]))
 				return parts[i+1];

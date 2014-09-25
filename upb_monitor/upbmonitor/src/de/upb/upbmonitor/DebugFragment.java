@@ -3,6 +3,7 @@ package de.upb.upbmonitor;
 import de.upb.upbmonitor.network.NetworkManager;
 import de.upb.upbmonitor.network.Route;
 import de.upb.upbmonitor.network.RouteManager;
+import de.upb.upbmonitor.network.Rule;
 import android.support.v4.app.Fragment;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -75,7 +76,7 @@ public class DebugFragment extends Fragment
             public void onClick(View v) {
                 // Perform action on click   
             	//NetworkManager.getInstance().associateToAccessPoint("64:70:02:0f:f4:a0");	
-            	for(Route r : RouteManager.getInstance().getRouteList())
+            	for(Rule r : RouteManager.getInstance().getRuleList())
             	{
             		Log.w(LTAG, r.toString());
             	}

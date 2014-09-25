@@ -40,6 +40,24 @@ public class RouteManager
 		}
 		return result;
 	}
+	
+	public synchronized ArrayList<Rule> getRuleList()
+	{
+		// get ip route show output
+		ArrayList<String> out = Shell.executeBlocking("ip rule show");
+		// if output is less than one line, something went wrong
+		if (out.size() < 1)
+			return null;
+		// create rule objects from each line
+		ArrayList<Rule> result = new ArrayList<Rule>();
+		for (String l : out)
+		{
+			Rule r = Rule.parse(l);
+			if (r != null)
+				result.add(r);
+		}
+		return result;
+	}
 
 	/**
 	 * Get first matching route. Use "null" as wildcard.
@@ -91,11 +109,23 @@ public class RouteManager
 		if (r != null)
 			Shell.execute("ip route add " + r.toString());
 	}
+	
+	public synchronized void addRule(Rule r)
+	{
+		if (r != null)
+			Shell.execute("ip rule add " + r.toString());
+	}
 
 	public synchronized void removeRoute(Route r)
 	{
 		if (r != null)
 			Shell.execute("ip route del " + r.toString());
+	}
+	
+	public synchronized void removeRule(Rule r)
+	{
+		if (r != null)
+			Shell.execute("ip rule del " + r.toString());
 	}
 
 	public synchronized boolean routeExists(String prefix, String via,
@@ -108,6 +138,23 @@ public class RouteManager
 	public synchronized boolean routeExists(Route r)
 	{
 		for (Route r2 : this.getRouteList())
+		{
+			if (r2 != null)
+				if (r2.equals(r))
+					return true;
+		}
+		return false;
+	}
+	
+	public synchronized boolean ruleExists(String from, String lookup)
+	{
+		Rule r = new Rule(from, lookup);
+		return ruleExists(r);
+	}
+
+	public synchronized boolean ruleExists(Rule r)
+	{
+		for (Rule r2 : this.getRuleList())
 		{
 			if (r2 != null)
 				if (r2.equals(r))
