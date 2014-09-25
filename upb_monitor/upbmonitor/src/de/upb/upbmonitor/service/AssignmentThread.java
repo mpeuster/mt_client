@@ -51,17 +51,23 @@ public class AssignmentThread implements Runnable
 			if (nm.isDualNetworkingEnabled()) // only change connection when DN
 												// is on!
 			{
+				boolean isMptcpEnabled = nm.isMptcpEnabled();
+				
 				if (assignedApBackend == null
 						|| assignedApBackend.equals("none"))
 				{
 					// --- CASE 1: No AP assigned by backend
 					// disconnect from Wi-Fi
 					nm.disassociateFromAccessPoint();
-					// switch DNS
-					nm.setDnsServer("8.8.8.8", "8.8.4.4",
-							NetworkManager.MOBILE_INTERFACE);
-					// swtich default route
-					rm.setDefaultRouteToMobile();
+					
+					if(!isMptcpEnabled) // do not change route in MPTCP mode
+					{
+						// switch DNS
+						nm.setDnsServer("8.8.8.8", "8.8.4.4",
+								NetworkManager.MOBILE_INTERFACE);
+						// swtich default route
+						rm.setDefaultRouteToMobile();
+					}
 				} else
 				{
 					// --- CASE 2: AP assigned by backend
@@ -85,11 +91,15 @@ public class AssignmentThread implements Runnable
 						Log.i(LTAG, "Trying to connect to Wi-Fi: " + SSID
 								+ " using BSSID: " + BSSID);
 						nm.associateToAccessPoint(BSSID);
-						// switch DNS
-						nm.setDnsServer("8.8.8.8", "8.8.4.4",
-								NetworkManager.WIFI_INTERFACE);
-						// swtich default route
-						rm.setDefaultRouteToWiFi();
+						
+						if(!isMptcpEnabled) // do not change route in MPTCP mode
+						{
+							// switch DNS
+							nm.setDnsServer("8.8.8.8", "8.8.4.4",
+									NetworkManager.WIFI_INTERFACE);
+							// swtich default route
+							rm.setDefaultRouteToWiFi();
+						}
 					}
 				}
 			}

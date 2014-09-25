@@ -186,7 +186,7 @@ public class RouteManager
 		this.addRoute(r);
 	}
 
-	private synchronized void removeDefaultRoutes()
+	public synchronized void removeDefaultRoutes()
 	{
 		Route r;
 		// remove default rmnet route (if present)
@@ -198,5 +198,17 @@ public class RouteManager
 		if (r != null)
 			this.removeRoute(r);
 	}
-
+	
+	/**
+	 * Removes all ip rules which have a match in the lookup field.
+	 */
+	public synchronized void removeRulesWithLookup(String lookup)
+	{
+		ArrayList<Rule> list = getRuleList();
+		for(Rule r : list)
+		{
+			if (lookup.equals(r.getLookup()))
+				removeRule(r);
+		}
+	}
 }

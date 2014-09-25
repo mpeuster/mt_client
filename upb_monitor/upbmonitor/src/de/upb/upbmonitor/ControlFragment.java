@@ -35,6 +35,8 @@ public class ControlFragment extends Fragment
 	// singelton instance
 	private static ControlFragment INSTANCE = null;
 
+	private SharedPreferences settings;
+
 	private View rootView;
 	private Switch switchMonitoringService;
 	private Switch switchDualNetworking;
@@ -45,7 +47,7 @@ public class ControlFragment extends Fragment
 	private ImageView imageMobileStatus;
 	private ImageView imageWifiStatus;
 
-	private boolean mMptcpEnabled;
+	private boolean mMptcpInstalled;
 
 	private Handler mHandler = new Handler();
 	// enable only after dual network switch even, initial: bigger than
@@ -124,6 +126,9 @@ public class ControlFragment extends Fragment
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState)
 	{
+		// get preference manager
+		settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
 		// get UI resources
 		this.rootView = inflater.inflate(R.layout.fragment_control, container,
 				false);
@@ -145,7 +150,7 @@ public class ControlFragment extends Fragment
 				.findViewById(R.id.checkBoxMPTCP);
 
 		// check MPTCP availability
-		this.mMptcpEnabled = this.checkMptcpEnabled();
+		this.mMptcpInstalled = this.isMptcpInstalled();
 
 		// set switch state based on service state (if app is restarted)
 		this.switchMonitoringService
@@ -181,9 +186,10 @@ public class ControlFragment extends Fragment
 							boolean isChecked)
 					{
 						// update MPTCP CheckBox
-						checkMPTCPEnabled.setEnabled(mMptcpEnabled
+						checkMPTCPEnabled.setEnabled(mMptcpInstalled
 								&& !isChecked);
-						textMPTCPStatus.setEnabled(mMptcpEnabled && !isChecked);
+						textMPTCPStatus.setEnabled(mMptcpInstalled
+								&& !isChecked);
 						// perform network change
 						if (isChecked)
 							startDualNetworking();
@@ -194,13 +200,15 @@ public class ControlFragment extends Fragment
 
 		// update and set MPTCP checkbox
 		this.textMPTCPStatus
-				.setText(this.mMptcpEnabled ? "(MPTCP: installed)"
+				.setText(this.mMptcpInstalled ? "(MPTCP: installed)"
 						: "(MPTCP: not installed)");
 		// update MPTCP CheckBox
-		checkMPTCPEnabled.setEnabled(mMptcpEnabled
+		checkMPTCPEnabled.setEnabled(mMptcpInstalled
 				&& !switchDualNetworking.isChecked());
-		textMPTCPStatus.setEnabled(mMptcpEnabled
+		textMPTCPStatus.setEnabled(mMptcpInstalled
 				&& !switchDualNetworking.isChecked());
+		checkMPTCPEnabled.setChecked(mMptcpInstalled
+				&& NetworkManager.getInstance().isMptcpEnabled());
 
 		// MPTCP CheckBox listener
 		this.checkMPTCPEnabled
@@ -210,7 +218,10 @@ public class ControlFragment extends Fragment
 					public void onCheckedChanged(CompoundButton buttonView,
 							boolean isChecked)
 					{
-						Log.w(LTAG, "MPTCP ChackBox: " + isChecked);
+						if(isChecked)
+							enableMptcp();
+						else
+							disableMptcp();
 					}
 				});
 
@@ -322,6 +333,18 @@ public class ControlFragment extends Fragment
 		nm.disableDualNetworking();
 	}
 
+	public void enableMptcp()
+	{
+		Shell.execute("sysctl -w net.mptcp.mptcp_enabled=1");
+		Log.i(LTAG, "Enableing MPTCP");
+	}
+
+	public void disableMptcp()
+	{
+		Shell.execute("sysctl -w net.mptcp.mptcp_enabled=0");
+		Log.i(LTAG, "Disableing MPTCP");
+	}
+
 	/**
 	 * checks if root access is possible and tries to get root access for this
 	 * app.
@@ -362,17 +385,17 @@ public class ControlFragment extends Fragment
 		return false;
 	}
 
-	private boolean checkMptcpEnabled()
+	private boolean isMptcpInstalled()
 	{
 		ArrayList<String> out = Shell
-				.executeBlocking("sysctl -a | grep mptcp_enabled");
+				.executeBlocking("sysctl -a | grep net.mptcp.mptcp_enabled");
 		// if output is not one line, something went wrong
 		if (out.size() < 1)
 			return false;
 		if (out.get(out.size() - 1).length() < 1)
 			return false;
 		String res = out.get(out.size() - 1); // always use last line
-		if ("net.mptcp.mptcp_enabled = 1".equals(res))
+		if (res.contains("net.mptcp.mptcp_enabled"))
 			return true;
 		return false;
 	}

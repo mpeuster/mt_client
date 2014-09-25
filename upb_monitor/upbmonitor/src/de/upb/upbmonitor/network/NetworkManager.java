@@ -131,6 +131,13 @@ public class NetworkManager
 		Shell.execute("svc data disable");
 		// trigger callback command
 		Shell.executeCustom(this.eventAfterDualNetworkingDisabled);
+		
+		// remove MPTCP routing rules
+		if(isMptcpEnabled())
+		{
+			RouteManager.getInstance().removeRulesWithLookup("1");
+			RouteManager.getInstance().removeRulesWithLookup("2");
+		}
 	}
 
 	/**
@@ -205,13 +212,13 @@ public class NetworkManager
 		// if output is not one line, something went wrong
 		if (out.size() < 1)
 		{
-			//Log.e(LTAG, "Error while fetching SSID.");
+			// Log.e(LTAG, "Error while fetching SSID.");
 			return null;
 		}
 		// get SSID (always use last output)
 		String ssid = out.get(out.size() - 1);
-		
-		if(ssid.contains("error") || ssid.contains("Failed"))
+
+		if (ssid.contains("error") || ssid.contains("Failed"))
 			return null;
 
 		Log.v(LTAG, "Current SSID: " + ssid);
@@ -311,36 +318,100 @@ public class NetworkManager
 				Log.i(LTAG, "Wifi is connected and runnig with IP: "
 						+ getWiFiInterfaceIp());
 
-				// set DNS server
-				setDnsServer("8.8.8.8", "8.8.4.4", WIFI_INTERFACE);
+				// check if MPTCP should be used
+				boolean mptcpEnabled = isMptcpEnabled();
 
-				// change routing
-				RouteManager rm = RouteManager.getInstance();
+				if (!isMptcpEnabled())
+				{ // -------- no MPTCP
+					// change routes to use WiFi for everything except backend
+					// communication
 
-				// set default route to use wlan0 (only remove the default to
-				rm.setDefaultRouteToWiFi();
-				// rmnet0)
-				// rm.removeRoute(rm.getRoute("default", null,
-				// NetworkManager.MOBILE_INTERFACE));
-
-				// set route to backend to always use dev rmnet0
-				String backend_ip = getBackendIp();
-				if (backend_ip != null)
-				{
-					Route rb = new Route(backend_ip, null, MOBILE_INTERFACE);
-					rm.addRoute(rb);
-					Log.i(LTAG,
-							"Added route for backend IP over rmnet0: "
-									+ rb.toString());
+					// set DNS server
+					setDnsServer("8.8.8.8", "8.8.4.4", WIFI_INTERFACE);
+					// change routing
+					RouteManager rm = RouteManager.getInstance();
+					// set default route
+					rm.setDefaultRouteToWiFi();
+					// set route to backend to always use dev rmnet0
+					String backend_ip = getBackendIp();
+					if (backend_ip != null)
+					{
+						Route rb = new Route(backend_ip, null, MOBILE_INTERFACE);
+						rm.addRoute(rb);
+						Log.i(LTAG, "Added route for backend IP over rmnet0: "
+								+ rb.toString());
+					} else
+					{
+						Log.e(LTAG,
+								"Can not resolve backend IP address. Route not set.");
+					}
+					// check for active WiFi route
+					if (!rm.routeExists("default", null, WIFI_INTERFACE, null,
+							null))
+						Log.e(LTAG, "ATTENTION: WiFi default route not found.");
 				} else
-				{
-					Log.e(LTAG,
-							"Can not resolve backend IP address. Route not set.");
-				}
+				{ // -------- MPTCP
+					// Use rmnet0 as global default connection, and additional
+					// paths on wlan0
+					// setup MPTCP routing scheme:
+					// Table 1: rmnet0
+					// Table 2: wlan0
+					// Attention: IPs of both interfaces must available here.
 
-				// check for active WiFi route
-				if (!rm.routeExists("default", null, WIFI_INTERFACE, null, null))
-					Log.e(LTAG, "ATTENTION: WiFi default route not found.");
+					// fetch necessary IP and subnet information
+					// TODO: this is a bit fuzzy. create better design.
+					String mobileNet = getMobileInterfaceIp();
+					String wifiNet = getWiFiInterfaceIp();
+					String mobileIp = null;
+					if (mobileNet.contains("/"))
+						mobileIp = mobileNet.split("/")[0];
+					String mobileSubnet = null;
+					if (mobileNet.contains("/"))
+						mobileSubnet = mobileNet.split("/")[1];
+					String wifiIp = null;
+					if (wifiNet.contains("/"))
+						wifiIp = wifiNet.split("/")[0];
+					String wifiSubnet = null;
+					if (wifiNet.contains("/"))
+						wifiSubnet = wifiNet.split("/")[1];
+					String mobileGw = getMobileGateway();
+					String wifiGw = getWifiGateway();
+
+					/*
+					 * Log.w(LTAG, mobileIp); Log.w(LTAG, mobileSubnet);
+					 * Log.w(LTAG, mobileGw); Log.w(LTAG, wifiIp); Log.w(LTAG,
+					 * wifiSubnet); Log.w(LTAG, wifiGw);
+					 */
+
+					// switch DNS
+					setDnsServer("8.8.8.8", "8.8.4.4",
+							NetworkManager.MOBILE_INTERFACE);
+
+					RouteManager rm = RouteManager.getInstance();
+					// remove all default routes
+					rm.removeDefaultRoutes();
+					// add rules for both source addresses
+					Rule r1 = new Rule(mobileIp, "1");
+					if(!rm.ruleExists(r1))
+						rm.addRule(r1);
+					Rule r2 = new Rule(wifiIp, "2");
+					if(!rm.ruleExists(r2))
+						rm.addRule(r2);
+					// setup table 1 (mobile)
+					// TODO check if this can make problem, since the second
+					// route is left out
+					rm.addRoute(new Route("default", mobileGw,
+							MOBILE_INTERFACE, null, "1"));
+					// setup table 2 (wifi)
+					// TODO check if this can make problem, since the second
+					// route is left out
+					rm.addRoute(new Route("default", wifiGw, WIFI_INTERFACE,
+							null, "2"));
+
+					// add global default route
+					rm.addRoute(new Route("default", mobileGw,
+							MOBILE_INTERFACE, "global", null));
+				}
 			}
 		}
 	};
@@ -423,7 +494,7 @@ public class NetworkManager
 		// if output is not one line, something went wrong
 		if (out.size() < 1)
 		{
-			//Log.e(LTAG, "Bad netcfg result: " + out);
+			// Log.e(LTAG, "Bad netcfg result: " + out);
 			return null;
 		}
 		// parse output and put all interesting values into array
@@ -516,10 +587,25 @@ public class NetworkManager
 			return null;
 		if (out.get(out.size() - 1).length() < 1)
 			return null;
-		String res =  out.get(out.size() - 1); // always use last line
-		Log.i(LTAG,"Lookup: " + hostname + " = " + res);
+		String res = out.get(out.size() - 1); // always use last line
+		Log.i(LTAG, "Lookup: " + hostname + " = " + res);
 		return res;
 
+	}
+
+	public boolean isMptcpEnabled()
+	{
+		ArrayList<String> out = Shell
+				.executeBlocking("sysctl -a 2>&1 | grep net.mptcp.mptcp_enabled | cut -d ' ' -f 3");
+		// if output is not one line, something went wrong
+		if (out.size() < 1)
+			return false;
+		if (out.get(out.size() - 1).length() < 1)
+			return false;
+		String res = out.get(out.size() - 1); // always use last line
+		if ("1".equals(res))
+			return true;
+		return false;
 	}
 
 }

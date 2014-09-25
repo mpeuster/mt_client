@@ -60,7 +60,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="8dp"
-                android:text="Enable or disable the dual connectivity mode. If enabled, 3G and Wi-Fi interfaces are active simultaneously. This action needs root access. Attention: Wi-Fi status is not shown in status bar of the device. Optional MPTCP: Configure routing for automatic MPTCP usage."
+                android:text="Enable or disable the dual connectivity mode. If enabled, 3G and Wi-Fi interfaces are active simultaneously. This action needs root access. Attention: Wi-Fi status is not shown in status bar of the device."
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <LinearLayout
@@ -71,7 +71,7 @@
                     android:id="@+id/checkBoxMPTCP"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Use MPTCP" />
+                    android:text="Enable MPTCP" />
 
                 <TextView
                     android:id="@+id/textViewMPTCP"
