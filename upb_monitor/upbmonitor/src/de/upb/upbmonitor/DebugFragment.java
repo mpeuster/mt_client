@@ -74,8 +74,11 @@ public class DebugFragment extends Fragment
 		b3.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Perform action on click   
-            	//NetworkManager.getInstance().associateToAccessPoint("64:70:02:0f:f4:a0");
-            	RouteManager.getInstance().setDefaultRouteToWiFi();
+            	//NetworkManager.getInstance().associateToAccessPoint("64:70:02:0f:f4:a0");	
+            	for(Route r : RouteManager.getInstance().getRouteList())
+            	{
+            		Log.w(LTAG, r.toString());
+            	}
             }
         });
 		

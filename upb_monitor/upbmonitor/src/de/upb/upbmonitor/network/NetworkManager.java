@@ -339,7 +339,7 @@ public class NetworkManager
 				}
 
 				// check for active WiFi route
-				if (!rm.routeExists("default", null, WIFI_INTERFACE))
+				if (!rm.routeExists("default", null, WIFI_INTERFACE, null, null))
 					Log.e(LTAG, "ATTENTION: WiFi default route not found.");
 			}
 		}

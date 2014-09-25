@@ -49,13 +49,16 @@ public class RouteManager
 	 * @param dev
 	 * @return
 	 */
-	public synchronized Route getRoute(String prefix, String via, String dev)
+	public synchronized Route getRoute(String prefix, String via, String dev,
+			String scope, String table)
 	{
 		for (Route r : this.getRouteList())
 		{
 			boolean prefix_ok = true;
 			boolean via_ok = true;
 			boolean dev_ok = true;
+			boolean scope_ok = true;
+			boolean table_ok = true;
 
 			if (prefix != null)
 				if (!prefix.equals(r.getPrefix()))
@@ -69,7 +72,15 @@ public class RouteManager
 				if (!dev.equals(r.getDev()))
 					dev_ok = false;
 
-			if (prefix_ok && via_ok && dev_ok)
+			if (scope != null)
+				if (!scope.equals(r.getScope()))
+					scope_ok = false;
+
+			if (table != null)
+				if (!table.equals(r.getTable()))
+					table_ok = false;
+
+			if (prefix_ok && via_ok && dev_ok && scope_ok && table_ok)
 				return r;
 		}
 		return null;
@@ -77,20 +88,20 @@ public class RouteManager
 
 	public synchronized void addRoute(Route r)
 	{
-		if(r != null)
+		if (r != null)
 			Shell.execute("ip route add " + r.toString());
 	}
 
 	public synchronized void removeRoute(Route r)
 	{
-		if(r != null)
+		if (r != null)
 			Shell.execute("ip route del " + r.toString());
-	}	
+	}
 
 	public synchronized boolean routeExists(String prefix, String via,
-			String dev)
+			String dev, String scope, String table)
 	{
-		Route r = new Route(prefix, via, dev);
+		Route r = new Route(prefix, via, dev, scope, table);
 		return routeExists(r);
 	}
 
@@ -107,7 +118,8 @@ public class RouteManager
 
 	public synchronized void setDefaultRouteToWiFi()
 	{
-		Log.i(LTAG, "Setting default route to: " + NetworkManager.WIFI_INTERFACE);
+		Log.i(LTAG, "Setting default route to: "
+				+ NetworkManager.WIFI_INTERFACE);
 		// remove existing default routes
 		this.removeDefaultRoutes();
 		// add new default route
@@ -118,7 +130,8 @@ public class RouteManager
 
 	public synchronized void setDefaultRouteToMobile()
 	{
-		Log.i(LTAG, "Setting default route to: " + NetworkManager.MOBILE_INTERFACE);
+		Log.i(LTAG, "Setting default route to: "
+				+ NetworkManager.MOBILE_INTERFACE);
 		// remove existing default routes
 		this.removeDefaultRoutes();
 		// add new default route
@@ -130,11 +143,11 @@ public class RouteManager
 	{
 		Route r;
 		// remove default rmnet route (if present)
-		r = this.getRoute("default", null, NetworkManager.MOBILE_INTERFACE);
+		r = this.getRoute("default", null, NetworkManager.MOBILE_INTERFACE, null, null);
 		if (r != null)
 			this.removeRoute(r);
 		// remove default rmnet route (if present)
-		r = this.getRoute("default", null, NetworkManager.WIFI_INTERFACE);
+		r = this.getRoute("default", null, NetworkManager.WIFI_INTERFACE, null, null);
 		if (r != null)
 			this.removeRoute(r);
 	}

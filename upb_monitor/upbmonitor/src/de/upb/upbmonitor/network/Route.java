@@ -5,6 +5,11 @@ import android.util.Log;
 public class Route
 {
 	private static final String LTAG = "Route";
+	private String prefix;
+	private String via;
+	private String dev;
+	private String scope;
+	private String table;
 
 	public String getPrefix()
 	{
@@ -35,10 +40,26 @@ public class Route
 	{
 		this.dev = dev;
 	}
+	
+	public String getScope()
+	{
+		return scope;
+	}
 
-	private String prefix;
-	private String via;
-	private String dev;
+	public void setScope(String scope)
+	{
+		this.scope = scope;
+	}
+
+	public String getTable()
+	{
+		return table;
+	}
+
+	public void setTable(String table)
+	{
+		this.table = table;
+	}
 
 	public static Route parse(String input)
 	{
@@ -46,28 +67,34 @@ public class Route
 		String prefix = null;
 		String via = null;
 		String dev = null;
+		String scope = null;
+		String table = null;
 
-		// at least prefix + vis or dev
+		// at least prefix + via or dev
 		String[] parts = input.split(" ");
 		if (parts.length < 3)
 			return null;
 
 		// parse for via or dev
 		prefix = parts[0];
-		if ("via".equals(parts[1]))
-			via = parts[2];
-		else if ("dev".equals(parts[1]))
-			dev = parts[2];
-		
-		// parse for 3 as third part
-		if(parts.length >= 5)
-			if ("dev".equals(parts[3]))
-				dev = parts[4];
-		
-		// Attention: all other parts like src, metrik, skope are ignored
+		via = getRouteValueByKey(parts, "via");
+		dev = getRouteValueByKey(parts, "dev");
+		scope = getRouteValueByKey(parts, "scope");
+		table = getRouteValueByKey(parts, "table");
 
 		// create new route object
-		return new Route(prefix, via, dev);
+		return new Route(prefix, via, dev, scope, table);
+	}
+	
+	private static String getRouteValueByKey(String[] parts,String k)
+	{
+		for(int i = 1; i < parts.length - 1; i++)
+		{
+			if (k.equals(parts[i]))
+				return parts[i+1];
+		}
+		// not found
+		return null;
 	}
 
 	public Route(String prefix, String via, String dev)
@@ -75,17 +102,34 @@ public class Route
 		this.prefix = prefix;
 		this.via = via;
 		this.dev = dev;
+		this.scope = null;
+		this.table = null;
+	}
+	
+	public Route(String prefix, String via, String dev, String scope, String table)
+	{
+		this.prefix = prefix;
+		this.via = via;
+		this.dev = dev;
+		this.scope = scope;
+		this.table = table;
 	}
 
 	public String toString()
 	{
 		String part2 = "";
 		String part3 = "";
+		String part4 = "";
+		String part5 = "";
 		if (via != null)
 			part2 = " via " + via;
 		if (dev != null)
 			part3 = " dev " + dev;
-		return this.prefix + part2 + part3;
+		if (scope != null)
+			part4 = " scope " + scope;
+		if (table != null)
+			part5 = " table " + table;
+		return this.prefix + part2 + part3 + part4 + part5;
 	}
 	
 	public boolean equals(Route r)
@@ -98,6 +142,12 @@ public class Route
 				return false;
 		if(this.dev != null && r.getDev() != null)
 			if (!this.dev.equals(r.getDev()))
+				return false;
+		if(this.scope != null && r.getScope() != null)
+			if (!this.scope.equals(r.getScope()))
+				return false;
+		if(this.table != null && r.getTable() != null)
+			if (!this.table.equals(r.getTable()))
 				return false;
 		return true;
 	}
