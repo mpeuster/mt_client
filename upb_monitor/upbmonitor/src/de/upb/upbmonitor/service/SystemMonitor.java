@@ -147,6 +147,8 @@ public class SystemMonitor
 					myContext,
 					"Changed location to: " + PREDEFINED_X[idx] + "/"
 							+ PREDEFINED_Y[idx], Toast.LENGTH_SHORT).show();
+			Log.i(LTAG, "Volume location change to: " + PREDEFINED_X[idx] + "/"
+					+ PREDEFINED_Y[idx]);
 		}
 
 		c.setPositionX(PREDEFINED_X[idx]);
