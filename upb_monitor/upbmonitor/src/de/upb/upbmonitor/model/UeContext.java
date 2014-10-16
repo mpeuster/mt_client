@@ -85,6 +85,14 @@ public class UeContext
 		e.commit();
 	}
 	
+	public synchronized boolean isBssidBasedApSelectionEnabled()
+	{
+		if(this.myContext == null)
+			return true;
+		SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this.myContext);
+		return p.getBoolean("pref_switch_bssid_assignment", true);
+	}
+	
 	private JSONObject mBackendContext;
 	
 	public synchronized JSONObject getBackendContext()

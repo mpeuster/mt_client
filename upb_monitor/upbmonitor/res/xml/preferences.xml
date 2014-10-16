@@ -13,6 +13,7 @@
         android:key="pref_key_category2">
         <EditTextPreference android:key="pref_wifi_default_ssid" android:title="Default SSID" android:defaultValue="BCG2Demo" android:summary="SSID of default WiFi in dual networking mode."/>
         <EditTextPreference android:key="pref_wifi_default_psk" android:title="Default WPA PSK" android:defaultValue="BCG2Demo2014" android:summary="PSK of default WiFi in doal networking mode. Set to 'none' to use no encryption."/>
+        <CheckBoxPreference android:key="pref_switch_bssid_assignment" android:title="BSSID based AP selection" android:summary="Let the UE select the used AP based on its BSSID" android:defaultValue="true" />
     </PreferenceCategory>
     <PreferenceCategory
         android:title="Monitoring"

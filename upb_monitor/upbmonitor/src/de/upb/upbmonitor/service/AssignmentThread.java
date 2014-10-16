@@ -21,12 +21,17 @@ public class AssignmentThread implements Runnable
 	private static final String LTAG = "AssignmentThread";
 	private Handler myHandler;
 	private int mInterval;
+	private boolean useBssidApSelection;
 
 	public AssignmentThread(Handler myHandler, int interval)
 	{
 		// arguments
 		this.myHandler = myHandler;
 		this.mInterval = interval;
+
+		// get settings
+		this.useBssidApSelection = UeContext.getInstance()
+				.isBssidBasedApSelectionEnabled();
 
 		// kick off periodic run
 		this.getHandler().postDelayed(this, 0);
@@ -52,15 +57,19 @@ public class AssignmentThread implements Runnable
 												// is on!
 			{
 				boolean isMptcpEnabled = nm.isMptcpEnabled();
-				
+
 				if (assignedApBackend == null
 						|| assignedApBackend.equals("none"))
 				{
 					// --- CASE 1: No AP assigned by backend
-					// disconnect from Wi-Fi
-					nm.disassociateFromAccessPoint();
-					
-					if(!isMptcpEnabled) // do not change route in MPTCP mode
+
+					if (useBssidApSelection)
+					{
+						// disconnect from Wi-Fi
+						nm.disassociateFromAccessPoint();
+					}
+
+					if (!isMptcpEnabled) // do not change route in MPTCP mode
 					{
 						// switch DNS
 						nm.setDnsServer("8.8.8.8", "8.8.4.4",
@@ -74,8 +83,6 @@ public class AssignmentThread implements Runnable
 					// fetch information about assigned Wi-Fi
 					String SSID = ApModel.getInstance().getSsid(
 							assignedApBackend);
-					// String PSK =
-					// ApModel.getInstance().getPsk(assignedApBackend);
 					String BSSID = ApModel.getInstance().getBssid(
 							assignedApBackend);
 
@@ -87,12 +94,16 @@ public class AssignmentThread implements Runnable
 						Log.w(LTAG, "AP without BSSID assigned!");
 					} else
 					{
-						// connect new assigned Wi-Fi
-						Log.i(LTAG, "Trying to connect to Wi-Fi: " + SSID
-								+ " using BSSID: " + BSSID);
-						nm.associateToAccessPoint(BSSID);
-						
-						if(!isMptcpEnabled) // do not change route in MPTCP mode
+						if (useBssidApSelection)
+						{
+							// connect new assigned Wi-Fi
+							Log.i(LTAG, "Trying to connect to Wi-Fi: " + SSID
+									+ " using BSSID: " + BSSID);
+							nm.associateToAccessPoint(BSSID);
+						}
+
+						if (!isMptcpEnabled) // do not change route in MPTCP
+												// mode
 						{
 							// switch DNS
 							nm.setDnsServer("8.8.8.8", "8.8.4.4",
