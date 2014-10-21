@@ -44,7 +44,11 @@ public class CmdCallback extends CommandCapture
 	@Override
 	public void commandTerminated(int id, String reason)
 	{
-		this.notifyAll();
+		try{
+			this.notifyAll();
+		} catch(Exception e)
+		{
+		}
 	}
 	
 	public synchronized ArrayList<String> getOutput()
