@@ -3,7 +3,7 @@
     <PreferenceCategory 
         android:title="Backend"
         android:key="pref_key_category1">
-	    <EditTextPreference android:title="Backend API address" android:key="pref_backend_api_address" android:defaultValue="fg-cn-pgsp-kvm.cs.upb.de" android:summary="Address of the RESTful backend API. IP or domain without 'http.//'."/>
+	    <EditTextPreference android:title="Backend API IP" android:key="pref_backend_api_address" android:defaultValue="131.234.40.65" android:summary="Address of the RESTful backend API. Always use IP without 'http.//'."/>
 	    <EditTextPreference android:key="pref_backend_api_port" android:title="Backend API port" android:defaultValue="6680" android:summary="Port of the RESTful backend API."/>
 	    <EditTextPreference android:title="Device ID" android:key="prof_backend_device_id" android:defaultValue="UE-UPB1" android:summary="Name to identify this UE in the backend controller."/>
 	    <EditTextPreference android:title="Location Service ID" android:key="prof_backend_locationservice_id" android:defaultValue="node1" android:summary="Associatin name for third party location service."/>
@@ -15,6 +15,16 @@
         <EditTextPreference android:key="pref_wifi_default_psk" android:title="Default WPA PSK" android:defaultValue="BCG2Demo2014" android:summary="PSK of default WiFi in doal networking mode. Set to 'none' to use no encryption."/>
         <CheckBoxPreference android:key="pref_switch_bssid_assignment" android:title="BSSID based AP selection" android:summary="Let the UE select the used AP based on its BSSID" android:defaultValue="true" />
     </PreferenceCategory>
+    <!--  
+    <PreferenceCategory
+        android:title="Network"
+        android:key="pref_key_category2">
+        <CheckBoxPreference android:key="pref_switch_static_ip" android:title="Use static IP for Wi-Fi." android:summary="Configure IP and gateway in this app." android:defaultValue="true" />
+        <EditTextPreference android:key="pref_network_ip" android:title="IP address" android:defaultValue="10.10.10.10" android:summary=""/>
+        <EditTextPreference android:key="pref_network_subnet" android:title="Subnet" android:defaultValue="255.255.255.0" android:summary=""/>
+        <EditTextPreference android:key="pref_network_gateway" android:title="Gateway IP address" android:defaultValue="10.10.10.254" android:summary=""/>
+    </PreferenceCategory>
+    -->
     <PreferenceCategory
         android:title="Monitoring"
         android:key="pref_key_category3">

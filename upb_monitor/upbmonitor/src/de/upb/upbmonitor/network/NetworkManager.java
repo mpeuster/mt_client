@@ -580,6 +580,8 @@ public class NetworkManager
 
 	public String getIpByHostname(String hostname)
 	{
+		return hostname;
+		/*
 		ArrayList<String> out = Shell.executeBlocking("nslookup " + hostname
 				+ " | grep \"Address 1\" | cut -d \" \" -f3");
 		// if output is not one line, something went wrong
@@ -590,6 +592,7 @@ public class NetworkManager
 		String res = out.get(out.size() - 1); // always use last line
 		Log.i(LTAG, "Lookup: " + hostname + " = " + res);
 		return res;
+		*/
 
 	}
 
