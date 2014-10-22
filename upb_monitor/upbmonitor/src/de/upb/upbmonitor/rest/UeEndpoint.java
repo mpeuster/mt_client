@@ -19,6 +19,7 @@ public class UeEndpoint
 	private static final String LTAG = "UeEndpoint";
 	private String mUrl;
 	private ApEndpoint mRestApEndpoint; // used to fetch AP data after registration
+	private boolean isRegistered = false;
 
 	public UeEndpoint(String host, int port)
 	{
@@ -43,8 +44,11 @@ public class UeEndpoint
 				}
 				if (response.getStatusLine().getStatusCode() != 201)
 				{
-					Log.e(LTAG, "Bad Request: "
-							+ response.getStatusLine().getStatusCode());
+					if(!isRegistered)
+					{
+						Log.e(LTAG, "(Register) Bad Request: "
+								+ response.getStatusLine().getStatusCode());
+					}
 					return;
 				}
 				// result code looks fine, process it:
@@ -58,7 +62,7 @@ public class UeEndpoint
 					UeContext c = UeContext.getInstance();
 					c.setURI(temp.get(0).toString());					
 					Log.i(LTAG, "Registered with URI: " + c.getURI());
-					
+					isRegistered = true;
 					// now fetch all AP information from system
 					mRestApEndpoint.fetchApData();
 					
@@ -91,7 +95,7 @@ public class UeEndpoint
 				}
 				if (response.getStatusLine().getStatusCode() != 204)
 				{
-					Log.e(LTAG, "Bad Request: "
+					Log.e(LTAG, "(Update) Bad Request: "
 							+ response.getStatusLine().getStatusCode());
 					return;
 				}
