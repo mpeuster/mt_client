@@ -104,8 +104,10 @@ public class NetworkManager
 		// connect to actual wifi
 		Shell.execute("wpa_supplicant -B -Dnl80211 -iwlan0 -c/data/misc/wifi/wpa_supplicant.conf");
 		// bring up dhcp client and receive ip (takes some time!)
-		Shell.execute("dhcpcd wlan0");
+		//TODO DHCP / static IP integration
+		//Shell.execute("dhcpcd wlan0");
 		//Shell.execute("netcfg wlan0 dhcp");
+		Shell.execute("ifconfig wlan0 192.168.1.99");
 		// run custom callback command to trigger setup after connection is
 		// established and IP is received
 		Shell.executeCustom(this.eventAfterWifiConnected);
@@ -318,9 +320,6 @@ public class NetworkManager
 				Log.i(LTAG, "Wifi is connected and runnig with IP: "
 						+ getWiFiInterfaceIp());
 
-				// check if MPTCP should be used
-				boolean mptcpEnabled = isMptcpEnabled();
-
 				if (!isMptcpEnabled())
 				{ // -------- no MPTCP
 					// change routes to use WiFi for everything except backend
@@ -331,20 +330,9 @@ public class NetworkManager
 					// change routing
 					RouteManager rm = RouteManager.getInstance();
 					// set default route
-					rm.setDefaultRouteToWiFi();
+					setDefaultRouteToWiFi();
 					// set route to backend to always use dev rmnet0
-					String backend_ip = getBackendIp();
-					if (backend_ip != null)
-					{
-						Route rb = new Route(backend_ip, null, MOBILE_INTERFACE);
-						rm.addRoute(rb);
-						Log.i(LTAG, "Added route for backend IP over rmnet0: "
-								+ rb.toString());
-					} else
-					{
-						Log.e(LTAG,
-								"Can not resolve backend IP address. Route not set.");
-					}
+					setBackendRoute();
 					// check for active WiFi route
 					if (!rm.routeExists("default", null, WIFI_INTERFACE, null,
 							null))
@@ -407,7 +395,6 @@ public class NetworkManager
 					// route is left out
 					rm.addRoute(new Route("default", wifiGw, WIFI_INTERFACE,
 							null, "2"));
-
 					// add global default route
 					rm.addRoute(new Route("default", mobileGw,
 							MOBILE_INTERFACE, "global", null));
@@ -435,6 +422,49 @@ public class NetworkManager
 	/**
 	 * ====================== HELPER ======================
 	 */
+	
+	public synchronized void setBackendRoute()
+	{
+		RouteManager rm = RouteManager.getInstance();
+		String backend_ip = getBackendIp();
+		if (backend_ip != null)
+		{
+			Route rb = new Route(backend_ip, null, MOBILE_INTERFACE);
+			rm.addRoute(rb);
+			Log.i(LTAG, "Added route for backend IP over rmnet0: "
+					+ rb.toString());
+		} else
+		{
+			Log.e(LTAG,
+					"Can not resolve backend IP address. Route not set.");
+		}
+	}
+	
+	public synchronized void setBackendRoute(String backend_ip)
+	{
+		RouteManager rm = RouteManager.getInstance();
+		if (backend_ip != null)
+		{
+			Route rb = new Route(backend_ip, null, MOBILE_INTERFACE);
+			rm.addRoute(rb);
+			Log.i(LTAG, "Added route for backend IP over rmnet0: "
+					+ rb.toString());
+		} else
+		{
+			Log.e(LTAG,
+					"Can not resolve backend IP address. Route not set.");
+		}
+	}
+	
+	public synchronized void setDefaultRouteToWiFi()
+	{
+		RouteManager.getInstance().setDefaultRouteToWiFi();
+	}
+	
+	public synchronized void setDefaultRouteToMobile()
+	{
+		RouteManager.getInstance().setDefaultRouteToMobile();
+	}
 
 	private synchronized String getInterfaceIp(String interfaceName)
 	{

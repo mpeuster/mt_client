@@ -61,14 +61,14 @@ public class DebugFragment extends Fragment
             	//NetworkManager.getInstance().getCurrentSsid();
             	//NetworkManager.getInstance().connectWiFi("webauth", null);
             	//Log.i(LTAG, NetworkManager.getInstance().getBackendIp());
-            	NetworkManager.getInstance().associateToAccessPoint("64:70:02:1a:cf:e4");
+            	//NetworkManager.getInstance().associateToAccessPoint("64:70:02:1a:cf:e4");
             }
         });
 		
 		b2.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Perform action on click
-            	NetworkManager.getInstance().associateToAccessPoint("64:70:02:18:7c:60");
+            	//NetworkManager.getInstance().associateToAccessPoint("64:70:02:18:7c:60");
             }
         });
 		
@@ -76,10 +76,10 @@ public class DebugFragment extends Fragment
             public void onClick(View v) {
                 // Perform action on click   
             	//NetworkManager.getInstance().associateToAccessPoint("64:70:02:0f:f4:a0");	
-            	for(Rule r : RouteManager.getInstance().getRuleList())
-            	{
-            		Log.w(LTAG, r.toString());
-            	}
+            	//for(Rule r : RouteManager.getInstance().getRuleList())
+            	//{
+            	//	Log.w(LTAG, r.toString());
+            	//}
             }
         });
 		
@@ -88,7 +88,7 @@ public class DebugFragment extends Fragment
                 // Perform action on click
             	//NetworkManager.getInstance().connectToAccessPoint("64:70:02:18:a0:ed");
             	//NetworkManager.getInstance().disassociateFromAccessPoint();
-            	RouteManager.getInstance().setDefaultRouteToMobile();
+            	//RouteManager.getInstance().setDefaultRouteToMobile();
             }
         });
 		

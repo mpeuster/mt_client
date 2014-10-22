@@ -107,6 +107,9 @@ public class ManagementService extends Service
 
 		// initialize context model
 		this.initializeContext();
+		
+		// ensure that backend route is set
+		NetworkManager.getInstance().setBackendRoute(BACKEND_HOST);
 
 		// start monitoring task (independent looper thread)
 		this.monitorThread = new HandlerThread("MonitorThread");

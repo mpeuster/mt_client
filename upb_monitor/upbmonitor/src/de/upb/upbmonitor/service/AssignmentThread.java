@@ -75,7 +75,8 @@ public class AssignmentThread implements Runnable
 						nm.setDnsServer("8.8.8.8", "8.8.4.4",
 								NetworkManager.MOBILE_INTERFACE);
 						// swtich default route
-						rm.setDefaultRouteToMobile();
+						nm.setDefaultRouteToMobile();
+						nm.setBackendRoute();
 					}
 				} else
 				{
@@ -109,7 +110,8 @@ public class AssignmentThread implements Runnable
 							nm.setDnsServer("8.8.8.8", "8.8.4.4",
 									NetworkManager.WIFI_INTERFACE);
 							// swtich default route
-							rm.setDefaultRouteToWiFi();
+							nm.setDefaultRouteToWiFi();
+							nm.setBackendRoute();
 						}
 					}
 				}
