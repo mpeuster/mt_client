@@ -1,5 +1,6 @@
 package de.upb.upbmonitor;
 
+import de.upb.upbmonitor.commandline.Shell;
 import de.upb.upbmonitor.network.NetworkManager;
 import de.upb.upbmonitor.network.Route;
 import de.upb.upbmonitor.network.RouteManager;
@@ -53,42 +54,33 @@ public class DebugFragment extends Fragment
 		// add events
 		b1.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                //NetworkManager.getInstance().switchWiFi();
-            	//NetworkManager.getInstance().getWiFiInterfaceIp();
-            	//NetworkManager.getInstance().getWiFiInterfaceMac();
-            	//NetworkManager.getInstance().getMobileInterfaceIp();
-            	//NetworkManager.getInstance().getMobileInterfaceMac();
-            	//NetworkManager.getInstance().getCurrentSsid();
-            	//NetworkManager.getInstance().connectWiFi("webauth", null);
-            	//Log.i(LTAG, NetworkManager.getInstance().getBackendIp());
-            	//NetworkManager.getInstance().associateToAccessPoint("64:70:02:1a:cf:e4");
+                // reset backend route
+            	NetworkManager.getInstance().setBackendRoute();
             }
         });
 		
 		b2.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // Perform action on click
-            	//NetworkManager.getInstance().associateToAccessPoint("64:70:02:18:7c:60");
+                // set default route WiFi
+            	NetworkManager.getInstance().setDefaultRouteToWiFi();
             }
         });
 		
 		b3.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // Perform action on click   
-            	//NetworkManager.getInstance().associateToAccessPoint("64:70:02:0f:f4:a0");	
-            	//for(Rule r : RouteManager.getInstance().getRuleList())
-            	//{
-            	//	Log.w(LTAG, r.toString());
-            	//}
+                // set default route mobile
+            	NetworkManager.getInstance().setDefaultRouteToMobile();
             }
         });
 		
 		b4.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // Perform action on click
-            	//NetworkManager.getInstance().connectToAccessPoint("64:70:02:18:a0:ed");
-            	//NetworkManager.getInstance().disassociateFromAccessPoint();
-            	//RouteManager.getInstance().setDefaultRouteToMobile();
+                // enable normal Wi-Fi
+            	Shell.executeBlocking("netcfg wlan0 down");
+            	Shell.executeBlocking("svc data disable");
+            	Shell.executeBlocking("netcfg wlan0 up");
+            	Shell.executeBlocking("svc wifi disable");
+            	Shell.executeBlocking("svc wifi enable");
             }
         });
 		

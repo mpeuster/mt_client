@@ -17,25 +17,25 @@
             android:id="@+id/buttonTest1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Test 1" />
+            android:text="Set backend route" />
         
         <Button
             android:id="@+id/buttonTest2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Test 2" />
+            android:text="Set default route to Wi-Fi"/>
         
         <Button
             android:id="@+id/buttonTest3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Test 3" />
+            android:text="Set default route to Mobile" />
         
         <Button
             android:id="@+id/buttonTest4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Test 4" />
+            android:text="Enable normal Wi-Fi" />
 
     </LinearLayout>
    

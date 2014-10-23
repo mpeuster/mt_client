@@ -185,8 +185,8 @@ public class MainActivity extends ActionBarActivity implements
 		@Override
 		public int getCount()
 		{
-			// Show 5 total pages.
-			return 5;
+			// Show 4 total pages.
+			return 4;
 		}
 
 		@Override

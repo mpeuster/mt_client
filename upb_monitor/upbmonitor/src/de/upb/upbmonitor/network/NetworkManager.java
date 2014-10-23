@@ -104,10 +104,17 @@ public class NetworkManager
 		// connect to actual wifi
 		Shell.execute("wpa_supplicant -B -Dnl80211 -iwlan0 -c/data/misc/wifi/wpa_supplicant.conf");
 		// bring up dhcp client and receive ip (takes some time!)
-		//TODO DHCP / static IP integration
-		//Shell.execute("dhcpcd wlan0");
-		//Shell.execute("netcfg wlan0 dhcp");
-		Shell.execute("ifconfig wlan0 192.168.1.99");
+		if (this.isStaticIpEnabled())
+		{
+			// static IP
+			Shell.execute("ifconfig wlan0 " + this.getStaticIp() + " netmask "
+					+ this.getStaticNetmask());
+		} else
+		{
+			// DHCP
+			Shell.execute("dhcpcd wlan0");
+			// Shell.execute("netcfg wlan0 dhcp");
+		}
 		// run custom callback command to trigger setup after connection is
 		// established and IP is received
 		Shell.executeCustom(this.eventAfterWifiConnected);
@@ -133,9 +140,9 @@ public class NetworkManager
 		Shell.execute("svc data disable");
 		// trigger callback command
 		Shell.executeCustom(this.eventAfterDualNetworkingDisabled);
-		
+
 		// remove MPTCP routing rules
-		if(isMptcpEnabled())
+		if (isMptcpEnabled())
 		{
 			RouteManager.getInstance().removeRulesWithLookup("1");
 			RouteManager.getInstance().removeRulesWithLookup("2");
@@ -235,6 +242,12 @@ public class NetworkManager
 
 	public synchronized String getWifiGateway()
 	{
+		if (this.isStaticIpEnabled())
+		{
+			// return static gateway
+			return this.getStaticGateway();
+		}
+		// return gateway fetched by dhcp
 		// not sure why, but this is not always the same, so try both:
 		String alt1 = this.getProp("dhcp." + WIFI_INTERFACE + ".gateway");
 		String alt2 = this.getProp("net." + WIFI_INTERFACE + ".gw");
@@ -380,19 +393,15 @@ public class NetworkManager
 					rm.removeDefaultRoutes();
 					// add rules for both source addresses
 					Rule r1 = new Rule(mobileIp, "1");
-					if(!rm.ruleExists(r1))
+					if (!rm.ruleExists(r1))
 						rm.addRule(r1);
 					Rule r2 = new Rule(wifiIp, "2");
-					if(!rm.ruleExists(r2))
+					if (!rm.ruleExists(r2))
 						rm.addRule(r2);
 					// setup table 1 (mobile)
-					// TODO check if this can make problem, since the second
-					// route is left out
 					rm.addRoute(new Route("default", mobileGw,
 							MOBILE_INTERFACE, null, "1"));
 					// setup table 2 (wifi)
-					// TODO check if this can make problem, since the second
-					// route is left out
 					rm.addRoute(new Route("default", wifiGw, WIFI_INTERFACE,
 							null, "2"));
 					// add global default route
@@ -422,7 +431,7 @@ public class NetworkManager
 	/**
 	 * ====================== HELPER ======================
 	 */
-	
+
 	public synchronized void setBackendRoute()
 	{
 		RouteManager rm = RouteManager.getInstance();
@@ -431,15 +440,14 @@ public class NetworkManager
 		{
 			Route rb = new Route(backend_ip, null, MOBILE_INTERFACE);
 			rm.addRoute(rb);
-			Log.i(LTAG, "Added route for backend IP over rmnet0: "
-					+ rb.toString());
+			Log.i(LTAG,
+					"Added route for backend IP over rmnet0: " + rb.toString());
 		} else
 		{
-			Log.e(LTAG,
-					"Can not resolve backend IP address. Route not set.");
+			Log.e(LTAG, "Can not resolve backend IP address. Route not set.");
 		}
 	}
-	
+
 	public synchronized void setBackendRoute(String backend_ip)
 	{
 		RouteManager rm = RouteManager.getInstance();
@@ -447,20 +455,19 @@ public class NetworkManager
 		{
 			Route rb = new Route(backend_ip, null, MOBILE_INTERFACE);
 			rm.addRoute(rb);
-			Log.i(LTAG, "Added route for backend IP over rmnet0: "
-					+ rb.toString());
+			Log.i(LTAG,
+					"Added route for backend IP over rmnet0: " + rb.toString());
 		} else
 		{
-			Log.e(LTAG,
-					"Can not resolve backend IP address. Route not set.");
+			Log.e(LTAG, "Can not resolve backend IP address. Route not set.");
 		}
 	}
-	
+
 	public synchronized void setDefaultRouteToWiFi()
 	{
 		RouteManager.getInstance().setDefaultRouteToWiFi();
 	}
-	
+
 	public synchronized void setDefaultRouteToMobile()
 	{
 		RouteManager.getInstance().setDefaultRouteToMobile();
@@ -612,17 +619,13 @@ public class NetworkManager
 	{
 		return hostname;
 		/*
-		ArrayList<String> out = Shell.executeBlocking("nslookup " + hostname
-				+ " | grep \"Address 1\" | cut -d \" \" -f3");
-		// if output is not one line, something went wrong
-		if (out.size() < 1)
-			return null;
-		if (out.get(out.size() - 1).length() < 1)
-			return null;
-		String res = out.get(out.size() - 1); // always use last line
-		Log.i(LTAG, "Lookup: " + hostname + " = " + res);
-		return res;
-		*/
+		 * ArrayList<String> out = Shell.executeBlocking("nslookup " + hostname
+		 * + " | grep \"Address 1\" | cut -d \" \" -f3"); // if output is not
+		 * one line, something went wrong if (out.size() < 1) return null; if
+		 * (out.get(out.size() - 1).length() < 1) return null; String res =
+		 * out.get(out.size() - 1); // always use last line Log.i(LTAG,
+		 * "Lookup: " + hostname + " = " + res); return res;
+		 */
 
 	}
 
@@ -639,6 +642,34 @@ public class NetworkManager
 		if ("1".equals(res))
 			return true;
 		return false;
+	}
+
+	public boolean isStaticIpEnabled()
+	{
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(this.myContext);
+		return preferences.getBoolean("pref_switch_static_ip", false);
+	}
+
+	public String getStaticIp()
+	{
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(this.myContext);
+		return preferences.getString("pref_network_ip", "10.10.10.10");
+	}
+
+	public String getStaticNetmask()
+	{
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(this.myContext);
+		return preferences.getString("pref_network_netmask", "255.255.255.0");
+	}
+
+	public String getStaticGateway()
+	{
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(this.myContext);
+		return preferences.getString("pref_network_gateway", "10.10.10.254");
 	}
 
 }

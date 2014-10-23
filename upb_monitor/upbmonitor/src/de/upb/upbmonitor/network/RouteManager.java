@@ -40,7 +40,7 @@ public class RouteManager
 		}
 		return result;
 	}
-	
+
 	public synchronized ArrayList<Rule> getRuleList()
 	{
 		// get ip route show output
@@ -70,6 +70,9 @@ public class RouteManager
 	public synchronized Route getRoute(String prefix, String via, String dev,
 			String scope, String table)
 	{
+		if (this.getRouteList() == null)
+			return null;
+
 		for (Route r : this.getRouteList())
 		{
 			boolean prefix_ok = true;
@@ -109,7 +112,7 @@ public class RouteManager
 		if (r != null)
 			Shell.execute("ip route add " + r.toString());
 	}
-	
+
 	public synchronized void addRule(Rule r)
 	{
 		if (r != null)
@@ -121,7 +124,7 @@ public class RouteManager
 		if (r != null)
 			Shell.execute("ip route del " + r.toString());
 	}
-	
+
 	public synchronized void removeRule(Rule r)
 	{
 		if (r != null)
@@ -145,7 +148,7 @@ public class RouteManager
 		}
 		return false;
 	}
-	
+
 	public synchronized boolean ruleExists(String from, String lookup)
 	{
 		Rule r = new Rule(from, lookup);
@@ -166,7 +169,8 @@ public class RouteManager
 	public synchronized void setDefaultRouteToWiFi()
 	{
 		Log.i(LTAG, "Setting default route to: "
-				+ NetworkManager.WIFI_INTERFACE);
+				+ NetworkManager.WIFI_INTERFACE + " via "
+				+ NetworkManager.getInstance().getWifiGateway());
 		// remove existing default routes
 		this.removeDefaultRoutes();
 		// add new default route
@@ -190,22 +194,24 @@ public class RouteManager
 	{
 		Route r;
 		// remove default rmnet route (if present)
-		r = this.getRoute("default", null, NetworkManager.MOBILE_INTERFACE, null, null);
+		r = this.getRoute("default", null, NetworkManager.MOBILE_INTERFACE,
+				null, null);
 		if (r != null)
 			this.removeRoute(r);
 		// remove default rmnet route (if present)
-		r = this.getRoute("default", null, NetworkManager.WIFI_INTERFACE, null, null);
+		r = this.getRoute("default", null, NetworkManager.WIFI_INTERFACE, null,
+				null);
 		if (r != null)
 			this.removeRoute(r);
 	}
-	
+
 	/**
 	 * Removes all ip rules which have a match in the lookup field.
 	 */
 	public synchronized void removeRulesWithLookup(String lookup)
 	{
 		ArrayList<Rule> list = getRuleList();
-		for(Rule r : list)
+		for (Rule r : list)
 		{
 			if (lookup.equals(r.getLookup()))
 				removeRule(r);
