@@ -125,8 +125,8 @@ public class SystemMonitor
 	private void setVolumeLocationInModel(SharedPreferences p)
 	{
 		// OPTIONAL make predefined volume locations configurable
-		float[] PREDEFINED_X = { 0, 800, 0, 800 };
-		float[] PREDEFINED_Y = { 0, 0, 800, 800 };
+		float[] PREDEFINED_X = { 120, 700, 250, 710 };
+		float[] PREDEFINED_Y = { 120, 100, 900, 600 };
 
 		AudioManager am = (AudioManager) myContext
 				.getSystemService(Context.AUDIO_SERVICE);

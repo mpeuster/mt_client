@@ -61,7 +61,7 @@ public class NetworkManager
 	{
 		Log.i(LTAG, "Enabling dual networking");
 		// disable wifi with the wifi manager
-		Shell.execute("svc wifi disable");
+		//Shell.execute("svc wifi disable"); // does not work on galaxy S3
 		// enable mobile with mobile manager
 		Shell.execute("svc data enable");
 		// bring up wifi interface by hand
