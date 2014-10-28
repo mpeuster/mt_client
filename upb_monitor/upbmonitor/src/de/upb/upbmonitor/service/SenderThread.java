@@ -48,8 +48,8 @@ public class SenderThread implements Runnable
 		{
 			// register UE in backend
 			this.restUeEndpoint.register();
-			// show toast message every n-th retry
-			if ((this.mRegisterTries - 1) % 5 == 0)
+			// show toast message only every n-th retry
+			if (this.mRegisterTries > 1 && (this.mRegisterTries - 1) % 5 == 0)
 			{
 				Toast.makeText(UeContext.getInstance().getApplicationContext(),
 						"Backend connection error.", Toast.LENGTH_SHORT).show();

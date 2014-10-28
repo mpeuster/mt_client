@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.util.Log;
+import android.widget.Toast;
 import de.upb.upbmonitor.model.ApModel;
 import de.upb.upbmonitor.model.UeContext;
 import de.upb.upbmonitor.rest.RestAsyncRequest.RequestType;
@@ -63,6 +64,8 @@ public class UeEndpoint
 					c.setURI(temp.get(0).toString());					
 					Log.i(LTAG, "Registered with URI: " + c.getURI());
 					isRegistered = true;
+					Toast.makeText(UeContext.getInstance().getApplicationContext(),
+							"UE registered in backend.", Toast.LENGTH_SHORT).show();
 					// now fetch all AP information from system
 					mRestApEndpoint.fetchApData();
 					

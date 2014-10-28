@@ -51,11 +51,7 @@ public class ManagementService extends Service
 		if(monitorTask.getHandler() != null)
 			monitorTask.getHandler().removeCallbacks(monitorTask);
 		monitorThread.quit();
-
-		if(senderTask.getHandler() != null)
-			senderTask.getHandler().removeCallbacks(senderTask);
-		senderThread.quit();
-		
+	
 		if(receiverTask.getHandler() != null)
 			receiverTask.getHandler().removeCallbacks(receiverTask);
 		receiverThread.quit();
@@ -65,6 +61,10 @@ public class ManagementService extends Service
 		assignmentThread.quit();
 
 		senderTask.removeUe(); // attention not async!
+		if(senderTask.getHandler() != null)
+			senderTask.getHandler().removeCallbacks(senderTask);
+		senderThread.quit();
+		
 		SERVICE_EXISTS = false;
 		
 		Log.i(LTAG, "Management service and its worker thrads successfully stopped.");
