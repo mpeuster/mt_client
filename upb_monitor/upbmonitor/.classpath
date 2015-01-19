@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="/Volumes/Data/Users/manuel/mt_client/upb_monitor/roottools/RootTools.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/manuel/GreenTouch/demo/mt_client/upb_monitor/roottools/RootTools.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
